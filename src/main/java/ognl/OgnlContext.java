@@ -31,7 +31,15 @@
 package ognl;
 
 import ognl.enhance.LocalReference;
+import ognl.extended.Config;
+import ognl.extended.DefaultObjectConstructor;
+import ognl.internal.extended.MutableInt;
 
+import static ognl.extended.Config.CURRENT_INDEX_KEY;
+import static ognl.extended.Config.OBJECT_CONSTRUCTOR_KEY;
+
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 
 /**
@@ -638,5 +646,20 @@ public class OgnlContext extends Object implements Map
     public int hashCode()
     {
         return _values.hashCode();
+    }
+    
+    public void extend() {
+      put(CURRENT_INDEX_KEY, new MutableInt());
+      put(OBJECT_CONSTRUCTOR_KEY, new DefaultObjectConstructor());
+      //put(OgnlContext.EXPRESSION_SET, value);
+    }
+
+    public void extend(ParameterizedType ptype) {
+        Type[] genericTypes = ptype.getActualTypeArguments();
+        if (genericTypes == null || genericTypes.length == 0) {
+            return;
+        }
+        this.put(Config.PARAMETERIZED_ROOT_TYPE_KEY, genericTypes);
+        extend();
     }
 }

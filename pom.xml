@@ -52,6 +52,10 @@
         </developer>
     </developers>
 
+    <properties>
+        <java.version>1.8</java.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -69,6 +73,11 @@
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
             <version>3.24.1-GA</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.4</version>
         </dependency>
     </dependencies>
 
