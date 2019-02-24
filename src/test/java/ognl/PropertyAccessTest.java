@@ -33,6 +33,7 @@ public class PropertyAccessTest {
     bindingList.add("insideTest.id=2");
     bindingList.add("insideTest.name=inside_2");
 
+    bindingList.add("myTest2.id=9");
     bindingList.add("myTest2.myTest2List[0].id=7");
     bindingList.add("myTest2.myTest2List[0].objects[0].name=obj3_name");
     bindingList.add("myTest2.myTest2List[0].objects[0].id=3");
@@ -46,5 +47,13 @@ public class PropertyAccessTest {
     bindingList.add("myTest2.myTest2List[1].objects[1].name=obj6_name");
 
     Ognl.getValue(bindingList, context, root);
+    assertEquals(Long.valueOf(9), root.getMyTest2().getId());
+    assertEquals(Long.valueOf(7), root.getMyTest2().getMyTest2List().get(0).getId());
+    assertEquals(Long.valueOf(8), root.getMyTest2().getMyTest2List().get(1).getId());
+    assertEquals(Long.valueOf(3), root.getMyTest2().getMyTest2List().get(0).getObjects().get(0).getId());
+    assertEquals(Long.valueOf(4), root.getMyTest2().getMyTest2List().get(0).getObjects().get(1).getId());
+    assertEquals(Long.valueOf(5), root.getMyTest2().getMyTest2List().get(1).getObjects().get(0).getId());
+    assertEquals(Long.valueOf(6), root.getMyTest2().getMyTest2List().get(1).getObjects().get(1).getId());
+    assertEquals(Long.valueOf(0), root.getMyTest2().getObjects().get(0).getId());
   }
 }

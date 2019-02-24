@@ -95,13 +95,13 @@ implements PropertyAccessor {
                     this.keepArraySource(ognlContext, target, index, level);
                 }
                 if (value != null || !isnullInited) {
-                    return value;
+                    return processObject(ognlContext, target, null, name, value);
                 }
                 if (clsObj == null) {
                     if (this.isUnknownInited(context)) {
                         value = new Object();
                         list.set(index, value);
-                        return value;
+                        return processObject(ognlContext, target, null, name, value);
                     }
                     throw new OgnlException("Could not determine type of the List");
                 }
@@ -112,28 +112,28 @@ implements PropertyAccessor {
                         this.keepArraySource(ognlContext, target, index, level);
                     }
                     list.set(index, value);
-                    return value;
+                    return processObject(ognlContext, target, null, name, value);
                 }
                 catch (IllegalAccessException | InstantiationException e) {
                     e.printStackTrace();
-                    return null;
+                    return processObject(ognlContext, target, null, name, null);
                 }
             }
             if (!isExpanded) {
-                return null;
+                return processObject(ognlContext, target, null, name, null);
             }
             for (int i = list.size(); i <= index; ++i) {
                 list.add(null);
             }
             if (!isnullInited) {
-                return null;
+                return processObject(ognlContext, target, null, name, null);
             }
             Object clsObj = this.getParameterizedType(ognlContext, level, 0);
             if (clsObj == null) {
                 if (this.isUnknownInited(context)) {
                     value = new Object();
                     list.set(index, value);
-                    return value;
+                    return processObject(ognlContext, target, null, name, value);
                 }
                 throw new OgnlException("Could not determine type of the List");
             }
@@ -144,14 +144,14 @@ implements PropertyAccessor {
                     this.keepArraySource(ognlContext, target, index, level);
                 }
                 list.set(index, value);
-                return value;
+                return processObject(ognlContext, target, null, name, value);
             }
             catch (IllegalAccessException | InstantiationException e) {
                 e.printStackTrace();
-                return null;
+                return processObject(ognlContext, target, null, name, null);
             }
         }
-        return null;
+        return processObject(ognlContext, target, null, name, null);
     }
 
     @Override

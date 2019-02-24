@@ -659,7 +659,8 @@ public class OgnlContext extends Object implements Map
         if (genericTypes == null || genericTypes.length == 0) {
             return;
         }
-        this.put(Config.PARAMETERIZED_ROOT_TYPE_KEY, genericTypes);
+        put(Config.PARAMETERIZED_ROOT_TYPE_KEY, genericTypes);
+        put(Config.GENERIC_PREFIX_KEY+'1', genericTypes);
         extend();
     }
 }

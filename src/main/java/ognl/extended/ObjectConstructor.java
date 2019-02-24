@@ -8,5 +8,5 @@ import java.util.Map;
 
 public interface ObjectConstructor {
   Object createObject(Class<?> cls, Class<?> componentType) throws InstantiationException, IllegalAccessException;
-  Object processObject(OgnlContext context, PropertyDescriptor propertyDescriptor, Object root, Object propertyObject, Map<String, Ognl.MyNode> nodes);
+  Object processObject(OgnlContext context, Object root, Object propertyDescriptor, Object propertyObject, Ognl.MyNode node);
 }

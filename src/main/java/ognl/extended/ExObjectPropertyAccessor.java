@@ -3,6 +3,8 @@
  */
 package ognl.extended;
 
+import java.beans.IntrospectionException;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
@@ -78,10 +80,7 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
                     throw new OgnlException(sb.toString());
                 }
             }
-
-            return ((ObjectConstructor)context.get(OBJECT_CONSTRUCTOR_KEY)).processObject(
-                    ognlContext, OgnlRuntime.getPropertyDescriptor(target.getClass(), (String) name),
-                    target, value, (Map<String, Ognl.MyNode>) context.get(Config.NEXT_CHAIN));
+            return processObject(ognlContext, target, (String) name, name, value);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -155,7 +154,7 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
                 return;
             }
             StringBuffer key = new StringBuffer();
-            key.append(GENERIC_PREFIX_KEY).append(String.valueOf(level + 1));
+            key.append(GENERIC_PREFIX_KEY).append(genericTypes.length);
             context.put(key.toString(), (Object) genericTypes);
         } else if (genericTypes[0] instanceof GenericArrayType) {
             GenericArrayType genericArrayType = (GenericArrayType) genericTypes[0];
@@ -184,6 +183,17 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
     public Object createProperObject(OgnlContext context, Class<?> cls, Class<?> componentType)
             throws InstantiationException, IllegalAccessException {
         return ((ObjectConstructor) context.get(OBJECT_CONSTRUCTOR_KEY)).createObject(cls, componentType);
+    }
+
+    Object processObject(OgnlContext context, Object target, String nameForBeanProperty, Object name, Object value) throws OgnlException {
+        Object propertyDescriptorValue = name;
+        try {
+            propertyDescriptorValue = OgnlRuntime.getPropertyDescriptor(target.getClass(), nameForBeanProperty);
+        } catch (IntrospectionException e) {
+            e.printStackTrace();
+        }
+        return ((ObjectConstructor)context.get(OBJECT_CONSTRUCTOR_KEY)).processObject(
+                context, target, propertyDescriptorValue, value, (Ognl.MyNode) context.get(Config.NEXT_CHAIN));
     }
 
     public void keepArraySource(OgnlContext context, Object target, String propertyName, int level) {
@@ -229,7 +239,7 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
         if (this.getGenericArgumentsCount() < 1 || paramIndex < 0) {
             return null;
         }
-        StringBuffer key = new StringBuffer().append(GENERIC_PREFIX_KEY).append(String.valueOf(level));
+        StringBuffer key = new StringBuffer().append(GENERIC_PREFIX_KEY).append(level);
         Type[] genericParameterTypes = (Type[]) context.get(key.toString());
         if (genericParameterTypes == null || genericParameterTypes.length < this.getGenericArgumentsCount()
                 || genericParameterTypes.length <= paramIndex) {

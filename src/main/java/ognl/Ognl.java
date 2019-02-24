@@ -39,6 +39,9 @@ import lombok.Getter;
 import lombok.Setter;
 import ognl.enhance.ExpressionAccessor;
 import ognl.extended.Config;
+import ognl.internal.extended.MutableInt;
+
+import static ognl.extended.Config.CURRENT_INDEX_KEY;
 
 /**
  * <p>
@@ -750,13 +753,20 @@ public abstract class Ognl {
     private Ognl() {
     }
 
-    public static Object getValue(Map<String, MyNode> expressionMap, Map context, Object root) throws OgnlException {
-        for (Iterator<Map.Entry<String, MyNode>> iterator = expressionMap.entrySet().iterator(); iterator.hasNext(); ) {
+    public static Object getValue(MyNode node, Map context, Object root) throws OgnlException {
+        int level = ((MutableInt) context.get(CURRENT_INDEX_KEY)).get();
+        for (Iterator<Map.Entry<String, MyNode>> iterator = node.getChildren().entrySet().iterator(); iterator.hasNext(); ) {
             Map.Entry<String, MyNode> nodeEntry = iterator.next();
             MyNode cNode = nodeEntry.getValue();
             if (cNode.getName() != null) {
-                context.put(Config.NEXT_CHAIN, cNode.getChildren());
-                getValue(parseExpression(cNode.getName()), context, root, null);
+                context.put(Config.NEXT_CHAIN, cNode);
+                context.put(CURRENT_INDEX_KEY, new MutableInt(level));
+                if(cNode.getValue() == null) {
+                    getValue(parseExpression(cNode.getName()), context, root, null);
+                }
+                else {
+                    setValue(parseExpression(cNode.getName()), context, root, cNode.getValue());
+                }
             }
         }
         return root;
@@ -764,7 +774,7 @@ public abstract class Ognl {
     public static Object getValue(List<String> expressions, Map context, Object root)
             throws OgnlException {
         MyNode myNode = z(expressions);
-        getValue(myNode.getChildren(), context, root);
+        getValue(myNode, context, root);
         return root;
     }
 
@@ -833,15 +843,29 @@ public abstract class Ognl {
         return m;
     }
 
-    @Getter
     public static class MyNode {
         private Map<String, MyNode> children = new HashMap<>();
         private String name;
-        @Setter
         private String value;
 
         public MyNode(String name) {
             this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public Map<String, MyNode> getChildren() {
+            return children;
         }
     }
 }
