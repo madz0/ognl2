@@ -4,7 +4,6 @@
 package ognl.extended;
 
 import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
@@ -180,7 +179,7 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
         }
     }
 
-    public Object createProperObject(OgnlContext context, Class<?> cls, Class<?> componentType)
+    Object createProperObject(OgnlContext context, Class<?> cls, Class<?> componentType)
             throws InstantiationException, IllegalAccessException {
         return ((ObjectConstructor) context.get(OBJECT_CONSTRUCTOR_KEY)).createObject(cls, componentType);
     }
@@ -193,10 +192,10 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
             e.printStackTrace();
         }
         return ((ObjectConstructor)context.get(OBJECT_CONSTRUCTOR_KEY)).processObject(
-                context, target, propertyDescriptorValue, value, (Ognl.MyNode) context.get(Config.NEXT_CHAIN));
+                context, target, propertyDescriptorValue, value, (MapNode) context.get(Config.NEXT_CHAIN));
     }
 
-    public void keepArraySource(OgnlContext context, Object target, String propertyName, int level) {
+    void keepArraySource(OgnlContext context, Object target, String propertyName, int level) {
         StringBuffer key = new StringBuffer();
         key.append(ARRAR_SOURCE_PREFIX_KEY).append(String.valueOf(level + 1));
         ArraySourceContainer a = new ArraySourceContainer();
@@ -205,7 +204,7 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
         context.put(key.toString(), a);
     }
 
-    public Type[] getPossibleSetGenericTypes(OgnlContext context, Object target, String name) throws Exception {
+    private Type[] getPossibleSetGenericTypes(OgnlContext context, Object target, String name) throws Exception {
         Type g;
         Method setMethod = OgnlRuntime.getSetMethod(context, target.getClass(), name);
         if (setMethod != null) {

@@ -32,13 +32,10 @@ package ognl;
 
 import java.io.StringReader;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import ognl.enhance.ExpressionAccessor;
 import ognl.extended.Config;
+import ognl.extended.MapNode;
 import ognl.internal.extended.MutableInt;
 
 import static ognl.extended.Config.CURRENT_INDEX_KEY;
@@ -753,67 +750,87 @@ public abstract class Ognl {
     private Ognl() {
     }
 
-    public static Object getValue(MyNode node, Map context, Object root) throws OgnlException {
+    public static Object getValue(MapNode node, Map context, Object root) throws OgnlException {
         int level = ((MutableInt) context.get(CURRENT_INDEX_KEY)).get();
-        for (Iterator<Map.Entry<String, MyNode>> iterator = node.getChildren().entrySet().iterator(); iterator.hasNext(); ) {
-            Map.Entry<String, MyNode> nodeEntry = iterator.next();
-            MyNode cNode = nodeEntry.getValue();
+        for (Iterator<Map.Entry<String, MapNode>> iterator = node.getChildren().entrySet().iterator(); iterator.hasNext(); ) {
+            Map.Entry<String, MapNode> nodeEntry = iterator.next();
+            MapNode cNode = nodeEntry.getValue();
             if (cNode.getName() != null) {
                 context.put(Config.NEXT_CHAIN, cNode);
                 context.put(CURRENT_INDEX_KEY, new MutableInt(level));
-                if(cNode.getValue() == null) {
+                if (cNode.getValue() == null) {
                     getValue(parseExpression(cNode.getName()), context, root, null);
-                }
-                else {
+                } else {
                     setValue(parseExpression(cNode.getName()), context, root, cNode.getValue());
                 }
             }
         }
         return root;
     }
+
     public static Object getValue(List<String> expressions, Map context, Object root)
             throws OgnlException {
-        MyNode myNode = z(expressions);
-        getValue(myNode, context, root);
+        MapNode mapNode = tokenize(expressions);
+        getValue(mapNode, context, root);
         return root;
     }
 
     private static Map<String, Token> specialTokensMap = new HashMap<>();
-
-    @AllArgsConstructor
-    @Getter
     private static class Token {
         private Boolean isPartOfName;
         private String token;
+        private NodeType nodeType;
+
+        Token(Boolean isPartOfName, String token, NodeType nodeType) {
+            this.isPartOfName = isPartOfName;
+            this.token = token;
+            this.nodeType = nodeType;
+        }
+
+        public Boolean getIsPartOfName() {
+            return isPartOfName;
+        }
+
+        public String getToken() {
+            return token;
+        }
+
+        public NodeType getNodeType() {
+            return nodeType;
+        }
     }
 
     static {
-        specialTokensMap.put(".", new Token(false, "."));
-        specialTokensMap.put("[", new Token(true, "]"));
-        specialTokensMap.put("=", new Token(false, "="));
+        specialTokensMap.put(".", new Token(false, ".", NodeType.SINGLE));
+        specialTokensMap.put("[", new Token(true, "]", NodeType.COLLECTION));
+        specialTokensMap.put("=", new Token(false, "=", NodeType.SINGLE));
     }
 
-    private static MyNode z(List<String> expressions) {
-        MyNode m = new MyNode(null);
+    private static MapNode tokenize(List<String> expressions) {
+        MapNode m = new MapNode(null, NodeType.UNKNOWN);
         for (String expr : expressions) {
-            MyNode currentNode = null;
-            //StringBuilder sb = new StringBuilder();
+            MapNode currentNode = null;
             StringBuilder name = new StringBuilder();
             Token nextToken = null;
             for (char ch : expr.toCharArray()) {
                 Token token = specialTokensMap.get(Character.toString(ch));
-                //sb.append(ch);
+                NodeType nodeType = NodeType.UNKNOWN;
                 if (token == null) {
                     name.append(ch);
                     if (nextToken != null && Character.toString(ch).equals(nextToken.getToken())) {
                         token = nextToken;
+                    }
+                } else {
+                    nodeType = token.getNodeType();
+                    if (currentNode != null && currentNode.getNodeType() == NodeType.UNKNOWN) {
+                        currentNode.setNodeType(token.getNodeType());
                     }
                 }
                 if (name.length() == 0) {
                     continue;
                 }
                 if (token != null) {
-                    Map<String, MyNode> childMap = null;
+                    Map<String, MapNode> childMap = null;
                     if (currentNode == null) {
                         childMap = m.getChildren();
                     } else {
@@ -821,7 +838,7 @@ public abstract class Ognl {
                     }
                     currentNode = childMap.get(name.toString());
                     if (currentNode == null) {
-                        currentNode = new MyNode(name.toString());
+                        currentNode = new MapNode(name.toString(), nodeType);
                         childMap.put(name.toString(), currentNode);
                     }
                     name = new StringBuilder();
@@ -843,29 +860,9 @@ public abstract class Ognl {
         return m;
     }
 
-    public static class MyNode {
-        private Map<String, MyNode> children = new HashMap<>();
-        private String name;
-        private String value;
-
-        public MyNode(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        public Map<String, MyNode> getChildren() {
-            return children;
-        }
+    public enum NodeType {
+        SINGLE,
+        COLLECTION,
+        UNKNOWN
     }
 }

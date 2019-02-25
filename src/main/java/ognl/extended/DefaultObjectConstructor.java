@@ -60,9 +60,10 @@ public class DefaultObjectConstructor implements ObjectConstructor {
     }
 
     @Override
-    public Object processObject(OgnlContext context, Object root, Object propertyDescriptor, Object propertyObject, Ognl.MyNode node) {
+    public Object processObject(OgnlContext context, Object root, Object propertyDescriptor,
+                                Object propertyObject, MapNode node) {
         context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
-        if(propertyDescriptor instanceof PropertyDescriptor && List.class.isAssignableFrom(((PropertyDescriptor)propertyDescriptor).getReadMethod().getReturnType())) {
+        if(node.isCollection()) {
             context.extend((ParameterizedType) ((PropertyDescriptor)propertyDescriptor).getReadMethod().getGenericReturnType());
         }
         else {
