@@ -10,8 +10,8 @@
     <groupId>ognl</groupId>
     <artifactId>ognl</artifactId>
     <packaging>jar</packaging>
-    <version>3.2.11-SNAPSHOT</version>
-    <name>OGNL - Object Graph Navigation Library</name>
+    <version>3.2.11-ext-SNAPSHOT</version>
+    <name>OGNL - Object Graph Navigation and Binding Library</name>
     <description>OGNL - Object Graph Navigation Library</description>
 
     <inceptionYear>1997</inceptionYear>
