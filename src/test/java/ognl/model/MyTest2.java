@@ -17,4 +17,5 @@ public class MyTest2 extends BaseModel {
     @MyTestAnnotation
     private Set<InsideTest> set;
     private List<MyTest2> myTest2List;
+    private Set<String> stringSet;
 }

@@ -768,6 +768,18 @@ public abstract class Ognl {
         return root;
     }
 
+    public static <T> T getValue(List<String> expressions, Map context, Class<T> rootClass)
+            throws OgnlException {
+        MapNode mapNode = tokenize(expressions);
+        try {
+            Object root = OgnlRuntime.createProperObject((OgnlContext) context, rootClass, rootClass.getComponentType(), mapNode);
+            getValue(mapNode, context, root);
+            return (T)root;
+        } catch (InstantiationException | IllegalAccessException e) {
+            return null;
+        }
+    }
+
     public static Object getValue(List<String> expressions, Map context, Object root)
             throws OgnlException {
         MapNode mapNode = tokenize(expressions);
@@ -806,8 +818,9 @@ public abstract class Ognl {
         specialTokensMap.put("=", new Token(false, "=", NodeType.SINGLE));
     }
 
-    private static MapNode tokenize(List<String> expressions) {
-        MapNode m = new MapNode(null, NodeType.UNKNOWN);
+    public static MapNode tokenize(List<String> expressions) {
+        MapNode m = new MapNode("_root_", NodeType.SINGLE);
+        m.setIsRoot(true);
         for (String expr : expressions) {
             MapNode currentNode = null;
             StringBuilder name = new StringBuilder();

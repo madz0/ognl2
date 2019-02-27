@@ -32,6 +32,7 @@ package ognl;
 
 import ognl.enhance.ExpressionCompiler;
 import ognl.enhance.UnsupportedCompilationException;
+import ognl.extended.OgnlPropertyDescriptor;
 
 import java.beans.IndexedPropertyDescriptor;
 import java.beans.PropertyDescriptor;
@@ -265,9 +266,9 @@ public class ASTProperty extends SimpleNode implements NodeType
                 }
             }
 
-            PropertyDescriptor pd = OgnlRuntime.getPropertyDescriptor(context.getCurrentObject().getClass(), name);
+            OgnlPropertyDescriptor pd = OgnlRuntime.getPropertyDescriptor(context.getCurrentObject().getClass(), name);
 
-            if (pd != null && pd.getReadMethod() != null
+            if (pd != null && pd.isPropertyDescriptor() && pd.getReadMethod() != null
                 && !context.getMemberAccess().isAccessible(context, context.getCurrentObject(), pd.getReadMethod(), name))
             {
                 throw new UnsupportedCompilationException("Member access forbidden for property " + name + " on class " + context.getCurrentObject().getClass());
@@ -277,13 +278,13 @@ public class ASTProperty extends SimpleNode implements NodeType
             {
                 // if an indexed method accessor need to use special property descriptors to find methods
 
-                if (pd instanceof IndexedPropertyDescriptor)
+                if (pd.isIndexedPropertyDescriptor())
                 {
-                    m = ((IndexedPropertyDescriptor) pd).getIndexedReadMethod();
+                    m = pd.getIndexedReadMethod();
                 } else
                 {
-                    if (pd instanceof ObjectIndexedPropertyDescriptor)
-                        m = ((ObjectIndexedPropertyDescriptor) pd).getIndexedReadMethod();
+                    if (pd.isObjectIndexedPropertyDescriptor())
+                        m = pd.getIndexedReadMethod();
                     else
                         throw new OgnlException("property '" + name + "' is not an indexed property");
                 }
@@ -310,14 +311,13 @@ public class ASTProperty extends SimpleNode implements NodeType
 
                 if (context.getCurrentObject().getClass().isArray())
                 {
-                    if (pd == null)
-                    {
-                        pd = OgnlRuntime.getProperty(context.getCurrentObject().getClass(), name);
+                    if (pd == null) {
+                        PropertyDescriptor pd2 = OgnlRuntime.getProperty(context.getCurrentObject().getClass(), name);
 
-                        if (pd != null && pd.getReadMethod() != null)
+                        if (pd2 != null && pd2.getReadMethod() != null)
                         {
-                            m = pd.getReadMethod();
-                            result = pd.getName();
+                            m = pd2.getReadMethod();
+                            result = pd2.getName();
                         } else
                         {
                             _getterClass = int.class;
@@ -521,7 +521,7 @@ public class ASTProperty extends SimpleNode implements NodeType
                 }
             }
 
-            PropertyDescriptor pd = OgnlRuntime.getPropertyDescriptor(OgnlRuntime.getCompiler().getInterfaceClass(context.getCurrentObject().getClass()), name);
+            OgnlPropertyDescriptor pd = OgnlRuntime.getPropertyDescriptor(OgnlRuntime.getCompiler().getInterfaceClass(context.getCurrentObject().getClass()), name);
 
             if (pd != null)
             {
@@ -537,17 +537,14 @@ public class ASTProperty extends SimpleNode implements NodeType
             {
                 // if an indexed method accessor need to use special property descriptors to find methods
 
-                if (pd instanceof IndexedPropertyDescriptor)
+                if (pd.isIndexedPropertyDescriptor())
                 {
-                    IndexedPropertyDescriptor ipd = (IndexedPropertyDescriptor)pd;
-                    m = lastChild(context) ? ipd.getIndexedWriteMethod() : ipd.getIndexedReadMethod();
+                    m = lastChild(context) ? pd.getIndexedWriteMethod() : pd.getIndexedReadMethod();
                 } else
                 {
-                    if (pd instanceof ObjectIndexedPropertyDescriptor)
+                    if (pd.isObjectIndexedPropertyDescriptor())
                     {
-                        ObjectIndexedPropertyDescriptor opd = (ObjectIndexedPropertyDescriptor)pd;
-
-                        m = lastChild(context) ? opd.getIndexedWriteMethod() : opd.getIndexedReadMethod();
+                        m = lastChild(context) ? pd.getIndexedWriteMethod() : pd.getIndexedReadMethod();
                     } else
                     {
                         throw new OgnlException("property '" + name + "' is not an indexed property");

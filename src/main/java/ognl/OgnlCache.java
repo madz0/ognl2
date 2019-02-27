@@ -18,9 +18,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import ognl.extended.OgnlPropertyDescriptor;
 import ognl.internal.ClassCache;
 import ognl.internal.ClassCacheImpl;
+import org.apache.commons.lang3.reflect.FieldUtils;
 
 public class OgnlCache {
 
@@ -252,6 +255,7 @@ public class OgnlCache {
         if ((result = (Map) _propertyDescriptorCache.get(targetClass)) == null) {
           PropertyDescriptor[] pda = Introspector.getBeanInfo(targetClass).getPropertyDescriptors();
 
+          Map<String, Field> fieldMap = FieldUtils.getAllFieldsList(targetClass).stream().collect(Collectors.toMap(Field::getName, x->x));
           result = new HashMap(101);
           for (int i = 0, icount = pda.length; i < icount; i++) {
             // workaround for Introspector bug 6528714 (bugs.sun.com)
@@ -264,7 +268,7 @@ public class OgnlCache {
                   pda[i].getName(), pda[i].getPropertyType(), false));
             }
 
-            result.put(pda[i].getName(), pda[i]);
+            result.put(pda[i].getName(), new OgnlPropertyDescriptor(fieldMap.get(pda[i].getName()), pda[i]));
           }
 
           OgnlRuntime.findObjectIndexedPropertyDescriptors(targetClass, result);

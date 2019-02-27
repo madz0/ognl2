@@ -41,11 +41,23 @@ implements PropertyAccessor {
             }
             return result;
         }
+        else if (name instanceof Number) {
+            this.decIndex(context);
+            ExListPropertyAccessor exListPropertyAccessor = new ExListPropertyAccessor();
+            return exListPropertyAccessor.getProperty(context, target, name);
+        }
         if (level == 1 && this.isFirstUnknownIgnored(context) && target.getClass().isAssignableFrom(ognlContext.getRoot().getClass())) {
             this.shiftGenericParameters(ognlContext, level);
             return target;
         }
         throw new NoSuchPropertyException(target, name);
+    }
+
+    @Override
+    public void setProperty(Map context, Object target, Object name, Object value) throws OgnlException {
+        this.incIndex(context);
+        Set set = (Set) target;
+        set.add(value);
     }
 }
 

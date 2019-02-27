@@ -29,12 +29,12 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
             int level = this.incIndex(context);
             if (level == 1 && this.isFirstAlwaysIgnored(context)
                     && target.getClass().isAssignableFrom(ognlContext.getRoot().getClass())) {
-                return target;
+                return processObject(ognlContext, target, null, null, context.get(Config.NEXT_CHAIN)!=null?target:name);
             }
             if (!this.hasGetProperty(context, target, name)) {
                 if (level == 1 && this.isFirstUnknownIgnored(context)
                         && target.getClass().isAssignableFrom(ognlContext.getRoot().getClass())) {
-                    return target;
+                    return processObject(ognlContext, target, null, null, context.get(Config.NEXT_CHAIN)!=null?target:name);
                 }
                 if (!this.isUnknownIsLiteral(context)) {
                     StringBuffer sb = new StringBuffer();
@@ -79,7 +79,9 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
                     throw new OgnlException(sb.toString());
                 }
             }
-            return processObject(ognlContext, target, (String) name, name, value);
+            value = processObject(ognlContext, target, (String) name, name, value);
+            setProperty(context, target, name, value);
+            return value;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -181,17 +183,22 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
 
     Object createProperObject(OgnlContext context, Class<?> cls, Class<?> componentType)
             throws InstantiationException, IllegalAccessException {
-        return ((ObjectConstructor) context.get(OBJECT_CONSTRUCTOR_KEY)).createObject(cls, componentType);
+        return ((ObjectConstructor) context.get(OBJECT_CONSTRUCTOR_KEY)).createObject(cls, componentType, (MapNode) context.get(Config.NEXT_CHAIN));
     }
 
     Object processObject(OgnlContext context, Object target, String nameForBeanProperty, Object name, Object value) throws OgnlException {
-        Object propertyDescriptorValue = name;
-        try {
-            propertyDescriptorValue = OgnlRuntime.getPropertyDescriptor(target.getClass(), nameForBeanProperty);
-        } catch (IntrospectionException e) {
-            e.printStackTrace();
+        OgnlPropertyDescriptor propertyDescriptorValue = null;
+        if (nameForBeanProperty != null) {
+            try {
+                propertyDescriptorValue = OgnlRuntime.getPropertyDescriptor(target.getClass(), nameForBeanProperty);
+            } catch (IntrospectionException e) {
+                e.printStackTrace();
+            }
         }
-        return ((ObjectConstructor)context.get(OBJECT_CONSTRUCTOR_KEY)).processObject(
+        if(propertyDescriptorValue == null) {
+            propertyDescriptorValue = new OgnlPropertyDescriptor(name);
+        }
+        return ((ObjectConstructor) context.get(OBJECT_CONSTRUCTOR_KEY)).processObject(
                 context, target, propertyDescriptorValue, value, (MapNode) context.get(Config.NEXT_CHAIN));
     }
 
@@ -248,12 +255,12 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
                 && (next_classes_len = genericParameterTypes.length - this.getGenericArgumentsCount()) > 0) {
             Class[] classes = new Class[next_classes_len];
             System.arraycopy(genericParameterTypes, this.getGenericArgumentsCount(), classes, 0, next_classes_len);
-            key = new StringBuffer().append(GENERIC_PREFIX_KEY).append(String.valueOf(level + 1));
-            context.put(key.toString(), (Object) classes);
-            return (Class) genericParameterTypes[paramIndex];
+            key = new StringBuffer().append(GENERIC_PREFIX_KEY).append(level + 1);
+            context.put(key.toString(), classes);
+            return genericParameterTypes[paramIndex];
         }
         if (genericParameterTypes[paramIndex] instanceof Class) {
-            return (Class) genericParameterTypes[paramIndex];
+            return genericParameterTypes[paramIndex];
         }
         ParameterizedType ptype = (ParameterizedType) genericParameterTypes[paramIndex];
         Class myCls = (Class) ptype.getRawType();
@@ -261,8 +268,8 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
         if (genericParameterTypes == null || genericParameterTypes.length == 0) {
             return myCls;
         }
-        key = new StringBuffer().append(GENERIC_PREFIX_KEY).append(String.valueOf(level + 1));
-        context.put(key.toString(), (Object) genericParameterTypes);
+        key = new StringBuffer().append(GENERIC_PREFIX_KEY).append(level + 1);
+        context.put(key.toString(), genericParameterTypes);
         return myCls;
     }
 

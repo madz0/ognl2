@@ -10,6 +10,7 @@ public class MapNode {
     private String name;
     private String value;
     private Ognl.NodeType nodeType;
+    private Boolean isRoot = false;
 
     public MapNode(String name, Ognl.NodeType nodeType) {
         this.name = name;
@@ -46,5 +47,13 @@ public class MapNode {
 
     public Boolean isCollection() {
         return nodeType == Ognl.NodeType.COLLECTION;
+    }
+
+    public Boolean getIsRoot() {
+        return isRoot;
+    }
+
+    public void setIsRoot(Boolean root) {
+        isRoot = root;
     }
 }

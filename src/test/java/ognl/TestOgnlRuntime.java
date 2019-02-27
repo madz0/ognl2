@@ -1,6 +1,7 @@
 package ognl;
 
 import junit.framework.TestCase;
+import ognl.extended.OgnlPropertyDescriptor;
 import org.ognl.test.objects.*;
 
 import java.beans.PropertyDescriptor;
@@ -283,7 +284,7 @@ public class TestOgnlRuntime extends TestCase {
     public void test_Get_Property_Descriptors_With_Synthetic_Methods()
         throws Exception
     {
-        PropertyDescriptor pd = OgnlRuntime.getPropertyDescriptor(SubclassSyntheticObject.class, "list");
+        OgnlPropertyDescriptor pd = OgnlRuntime.getPropertyDescriptor(SubclassSyntheticObject.class, "list");
 
         assert pd != null;
         assert OgnlRuntime.isMethodCallable(pd.getReadMethod());

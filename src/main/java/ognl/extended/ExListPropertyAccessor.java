@@ -8,11 +8,8 @@ import ognl.NoSuchPropertyException;
 import ognl.OgnlContext;
 import ognl.OgnlException;
 import ognl.PropertyAccessor;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 public class ExListPropertyAccessor
 extends ExObjectPropertyAccessor
@@ -25,7 +22,7 @@ implements PropertyAccessor {
             this.shiftGenericParameters(ognlContext, level);
             return target;
         }
-        List list = (List)target;
+        List list = target instanceof List? (List) target:new ArrayList((Set) target);
         if (name instanceof String) {
             Object result = null;
             if ("size".equals(name)) {
@@ -95,24 +92,29 @@ implements PropertyAccessor {
                     this.keepArraySource(ognlContext, target, index, level);
                 }
                 if (value != null || !isnullInited) {
-                    return processObject(ognlContext, target, null, name, value);
+                    value = processObject(ognlContext, target, null, name, value);
+                    list.set(index, value);
+                    return value;
                 }
                 if (clsObj == null) {
                     if (this.isUnknownInited(context)) {
-                        value = new Object();
+                        value = processObject(ognlContext, target, null, name, new Object());
                         list.set(index, value);
-                        return processObject(ognlContext, target, null, name, value);
+                        updateTargetIfSet(target, list);
+                        return value;
                     }
                     throw new OgnlException("Could not determine type of the List");
                 }
                 Class cls = (Class)clsObj;
                 try {
                     value = this.createProperObject(ognlContext, cls, cls.getComponentType());
+                    value = processObject(ognlContext, target, null, name, value);
                     if (cls.isArray()) {
                         this.keepArraySource(ognlContext, target, index, level);
                     }
                     list.set(index, value);
-                    return processObject(ognlContext, target, null, name, value);
+                    updateTargetIfSet(target, list);
+                    return value;
                 }
                 catch (IllegalAccessException | InstantiationException e) {
                     e.printStackTrace();
@@ -131,20 +133,23 @@ implements PropertyAccessor {
             Object clsObj = this.getParameterizedType(ognlContext, level, 0);
             if (clsObj == null) {
                 if (this.isUnknownInited(context)) {
-                    value = new Object();
+                    value = processObject(ognlContext, target, null, name, new Object());
                     list.set(index, value);
-                    return processObject(ognlContext, target, null, name, value);
+                    updateTargetIfSet(target, list);
+                    return value;
                 }
                 throw new OgnlException("Could not determine type of the List");
             }
             Class cls = (Class)clsObj;
             try {
                 value = this.createProperObject(ognlContext, cls, cls.getComponentType());
+                value = processObject(ognlContext, target, null, name, value);
                 if (cls.isArray()) {
                     this.keepArraySource(ognlContext, target, index, level);
                 }
                 list.set(index, value);
-                return processObject(ognlContext, target, null, name, value);
+                updateTargetIfSet(target, list);
+                return value;
             }
             catch (IllegalAccessException | InstantiationException e) {
                 e.printStackTrace();
@@ -231,6 +236,14 @@ implements PropertyAccessor {
     @Override
     public int getGenericArgumentsCount() {
         return 1;
+    }
+
+    private void updateTargetIfSet(Object target, List list) {
+        if(target instanceof Set) {
+            Set set = (Set) target;
+            set.clear();
+            set.addAll(list);
+        }
     }
 }
 

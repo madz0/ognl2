@@ -33,6 +33,7 @@ package ognl;
 import ognl.enhance.LocalReference;
 import ognl.extended.Config;
 import ognl.extended.DefaultObjectConstructor;
+import ognl.extended.ObjectConstructor;
 import ognl.internal.extended.MutableInt;
 
 import static ognl.extended.Config.CURRENT_INDEX_KEY;
@@ -651,7 +652,6 @@ public class OgnlContext extends Object implements Map
     public void extend() {
       put(CURRENT_INDEX_KEY, new MutableInt());
       put(OBJECT_CONSTRUCTOR_KEY, new DefaultObjectConstructor());
-      //put(OgnlContext.EXPRESSION_SET, value);
     }
 
     public void extend(ParameterizedType ptype) {
@@ -662,5 +662,9 @@ public class OgnlContext extends Object implements Map
         put(Config.PARAMETERIZED_ROOT_TYPE_KEY, genericTypes);
         put(Config.GENERIC_PREFIX_KEY+'1', genericTypes);
         extend();
+    }
+
+    public void addObjectConstructor(ObjectConstructor constructor) {
+        put(OBJECT_CONSTRUCTOR_KEY, constructor);
     }
 }
