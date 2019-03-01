@@ -38,7 +38,13 @@ public class DefaultObjectConstructor implements ObjectConstructor {
             if (LinkedHashSet.class.isAssignableFrom(cls)) {
                 return new LinkedHashSet();
             }
-            return new HashSet();
+            else if(HashSet.class.isAssignableFrom(cls)) {
+                return new HashSet();
+            }
+            else if(TreeSet.class.isAssignableFrom(cls)) {
+                return new TreeSet();
+            }
+            return new LinkedHashSet();
         }
         if (cls.isArray()) {
             return Array.newInstance(componentType, 1);

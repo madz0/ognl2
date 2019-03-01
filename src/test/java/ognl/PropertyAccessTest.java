@@ -17,7 +17,7 @@ public class PropertyAccessTest {
         OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
         context.extend();
         MyTest root = new MyTest();
-        Ognl.getValue("objects[0]=salam", context, root);
+        Ognl.getValue("objects[0]='salam'", context, root);
         assertEquals("salam", ((List) root.getObjects()).get(0));
     }
 
@@ -27,7 +27,7 @@ public class PropertyAccessTest {
         OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
         context.extend();
         MyTest2 root = new MyTest2();
-        Ognl.getValue("map['name'].name=salam", context, root);
+        Ognl.getValue("map['name'].name='salam'", context, root);
         assertEquals("salam", root.getMap().get("name").getName());
     }
 
@@ -78,6 +78,7 @@ public class PropertyAccessTest {
         Iterator<String> itStr = root.getMyTest2().getStringSet().iterator();
         assertEquals("stringSet0", itStr.next());
         assertEquals("stringSet1", itStr.next());
+        assertEquals("obj0_name", root.getMyTest2().getObjects().get(0).getName());
     }
 
     @Test
@@ -123,6 +124,7 @@ public class PropertyAccessTest {
     public void testBindWithFirstLetterAndClass() throws OgnlException {
         OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
         context.extend();
+        context.setFirstUnknownIgnorance(true);
         List<String> bindingList = new ArrayList<>();
         bindingList.add("myTest3.id=500");
         bindingList.add("myTest3.myTest2.objects[0].name=obj0_name");

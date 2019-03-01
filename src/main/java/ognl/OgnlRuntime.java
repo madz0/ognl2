@@ -30,44 +30,16 @@
 // --------------------------------------------------------------------------
 package ognl;
 
-import java.beans.BeanInfo;
-import java.beans.IndexedPropertyDescriptor;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.MethodDescriptor;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Proxy;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.security.Permission;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import ognl.enhance.ExpressionCompiler;
 import ognl.enhance.OgnlExpressionCompiler;
 import ognl.extended.*;
+
+import java.beans.*;
+import java.lang.reflect.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.security.Permission;
+import java.util.*;
 
 /**
  * Utility class used by internal OGNL API to do various things like:
@@ -1943,114 +1915,6 @@ public class OgnlRuntime {
         return hasSetMethod(context, target, targetClass, name) || hasField(context, target, targetClass, name);
     }
 
-    private static final boolean indexMethodCheck(List methods) {
-        boolean result = false;
-
-        if (methods.size() > 0) {
-            Method fm = (Method) methods.get(0);
-            Class[] fmpt = getParameterTypes(fm);
-            int fmpc = fmpt.length;
-            Class lastMethodClass = fm.getDeclaringClass();
-
-            result = true;
-            for (int i = 1; result && (i < methods.size()); i++) {
-                Method m = (Method) methods.get(i);
-                Class c = m.getDeclaringClass();
-
-                // Check to see if more than one method implemented per class
-                if (lastMethodClass == c) {
-                    result = false;
-                } else {
-                    Class[] mpt = getParameterTypes(fm);
-                    int mpc = fmpt.length;
-
-                    if (fmpc != mpc) {
-                        result = false;
-                    }
-                    for (int j = 0; j < fmpc; j++) {
-                        if (fmpt[j] != mpt[j]) {
-                            result = false;
-                            break;
-                        }
-                    }
-                }
-                lastMethodClass = c;
-            }
-        }
-        return result;
-    }
-
-    static void findObjectIndexedPropertyDescriptors(Class targetClass, Map intoMap) throws OgnlException {
-        Map allMethods = getMethods(targetClass, false);
-        Map pairs = new HashMap(101);
-
-        for (Iterator it = allMethods.keySet().iterator(); it.hasNext(); ) {
-            String methodName = (String) it.next();
-            List methods = (List) allMethods.get(methodName);
-
-            /*
-             * Only process set/get where there is exactly one implementation of the method
-             * per class and those implementations are all the same
-             */
-            if (indexMethodCheck(methods)) {
-                boolean isGet = false, isSet = false;
-                Method m = (Method) methods.get(0);
-
-                if (((isSet = methodName.startsWith(SET_PREFIX)) || (isGet = methodName.startsWith(GET_PREFIX)))
-                        && (methodName.length() > 3)) {
-                    String propertyName = Introspector.decapitalize(methodName.substring(3));
-                    Class[] parameterTypes = getParameterTypes(m);
-                    int parameterCount = parameterTypes.length;
-
-                    if (isGet && (parameterCount == 1) && (m.getReturnType() != Void.TYPE)) {
-                        List pair = (List) pairs.get(propertyName);
-
-                        if (pair == null) {
-                            pairs.put(propertyName, pair = new ArrayList());
-                        }
-                        pair.add(m);
-                    }
-                    if (isSet && (parameterCount == 2) && (m.getReturnType() == Void.TYPE)) {
-                        List pair = (List) pairs.get(propertyName);
-
-                        if (pair == null) {
-                            pairs.put(propertyName, pair = new ArrayList());
-                        }
-                        pair.add(m);
-                    }
-                }
-            }
-        }
-
-        for (Iterator it = pairs.keySet().iterator(); it.hasNext(); ) {
-            String propertyName = (String) it.next();
-            List methods = (List) pairs.get(propertyName);
-
-            if (methods.size() == 2) {
-                Method method1 = (Method) methods.get(0), method2 = (Method) methods.get(1),
-                        setMethod = (method1.getParameterTypes().length == 2) ? method1 : method2,
-                        getMethod = (setMethod == method1) ? method2 : method1;
-                Class keyType = getMethod.getParameterTypes()[0], propertyType = getMethod.getReturnType();
-
-                if (keyType == setMethod.getParameterTypes()[0]) {
-                    if (propertyType == setMethod.getParameterTypes()[1]) {
-                        ObjectIndexedPropertyDescriptor propertyDescriptor;
-
-                        try {
-                            propertyDescriptor = new ObjectIndexedPropertyDescriptor(propertyName, propertyType, getMethod,
-                                    setMethod);
-                        } catch (Exception ex) {
-                            throw new OgnlException(
-                                    "creating object indexed property descriptor for '" + propertyName + "' in " + targetClass, ex);
-                        }
-                        intoMap.put(propertyName, propertyDescriptor);
-                    }
-                }
-
-            }
-        }
-    }
-
     /**
      * This method returns the property descriptors for the given class as a Map.
      *
@@ -2193,7 +2057,7 @@ public class OgnlRuntime {
             if (pd != null) {
                 if (pd.isIndexedPropertyDescriptor()) {
                     result = INDEXED_PROPERTY_INT;
-                } else if (pd.isObjectIndexedPropertyDescriptor()) {
+                } else if (pd instanceof ObjectIndexedPropertyDescriptor) {
                     result = INDEXED_PROPERTY_OBJECT;
                 }
             }

@@ -208,7 +208,7 @@ public class OgnlTestCase extends TestCase {
                 assertEquals(testedResult, Ognl.getValue(expr, _context, _root));
             }
 
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             System.out.println("Caught exception " + ex);
             if (NullPointerException.class.isInstance(ex))
                 ex.printStackTrace();
@@ -221,7 +221,7 @@ public class OgnlTestCase extends TestCase {
             {
                 assertTrue(Exception.class.isAssignableFrom((Class) testedResult));
             } else
-                throw ex;
+                throw new Exception(ex);
         }
     }
 

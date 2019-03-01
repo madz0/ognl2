@@ -10,4 +10,5 @@ public class Config {
   public static final String NEXT_CHAIN = Config.class.getName()+"_NEXT_CHAIN";
   public static final String PARAMETERIZED_ROOT_TYPE_KEY = Config.class.getName()+"_PARAMETERIZED_ROOT_TYPE_KEY";
   public static final String EXPRESSION_SET = Config.class.getName()+"_EXPRESSION_SET";
+  public static final String IGNORE_FIRST_UNKNOWN_KEY = Config.class.getName()+"_IGNORE_FIRST_UNKNOWN_KEY";
 }

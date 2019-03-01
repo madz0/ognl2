@@ -44,11 +44,11 @@ implements PropertyAccessor {
             } else if ("isEmpty".equals(name)) {
                 result = map.isEmpty() ? Boolean.TRUE : Boolean.FALSE;
             } else {
-                if (level == 1 && this.isFirstUnknownIgnored(context) && target.getClass().isAssignableFrom(ognlContext.getRoot().getClass())) {
+                result = map.get(name);
+                if (result == null && level == 1 && this.isFirstUnknownIgnored(context) && target.getClass().isAssignableFrom(ognlContext.getRoot().getClass())) {
                     this.shiftGenericParameters(ognlContext, level);
                     return target;
                 }
-                result = map.get(name);
                 Object clsObj = this.getParameterizedType(ognlContext, level, 1);
                 if (this.isNullInited(context) && result == null) {
                     if (clsObj == null) {

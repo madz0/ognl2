@@ -26,9 +26,11 @@ public class OgnlPropertyDescriptor {
                 allAnnotationsMap.put(annotation.annotationType(), annotation);
             }
         }
-        annotations = descriptor.getReadMethod().getAnnotations();
-        for (Annotation annotation : annotations) {
-            allAnnotationsMap.put(annotation.annotationType(), annotation);
+        if (descriptor.getReadMethod() != null) {
+            annotations = descriptor.getReadMethod().getAnnotations();
+            for (Annotation annotation : annotations) {
+                allAnnotationsMap.put(annotation.annotationType(), annotation);
+            }
         }
     }
 
@@ -60,19 +62,13 @@ public class OgnlPropertyDescriptor {
         if (descriptor instanceof IndexedPropertyDescriptor) {
             return ((IndexedPropertyDescriptor) descriptor).getIndexedReadMethod();
         } else {
-            if (descriptor instanceof ObjectIndexedPropertyDescriptor) {
-                return ((ObjectIndexedPropertyDescriptor) descriptor).getIndexedReadMethod();
-            } else {
                 return null;
-            }
         }
     }
 
     public Method getIndexedWriteMethod() {
         if (descriptor instanceof IndexedPropertyDescriptor) {
             return ((IndexedPropertyDescriptor) descriptor).getIndexedWriteMethod();
-        } else if (descriptor instanceof ObjectIndexedPropertyDescriptor) {
-            return ((ObjectIndexedPropertyDescriptor) descriptor).getIndexedWriteMethod();
         } else {
             return null;
         }
@@ -80,10 +76,6 @@ public class OgnlPropertyDescriptor {
 
     public Boolean isIndexedPropertyDescriptor() {
         return descriptor instanceof IndexedPropertyDescriptor;
-    }
-
-    public Boolean isObjectIndexedPropertyDescriptor() {
-        return descriptor instanceof ObjectIndexedPropertyDescriptor;
     }
 
     public String getPropertyName() {

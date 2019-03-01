@@ -37,9 +37,7 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
                     return processObject(ognlContext, target, null, null, context.get(Config.NEXT_CHAIN) != null ? target : name);
                 }
                 if (!this.isUnknownIsLiteral(context)) {
-                    StringBuffer sb = new StringBuffer();
-                    sb.append("Could not find property ").append(name).append("  of ").append(target.getClass());
-                    throw new OgnlException(sb.toString());
+                    throw new NoSuchPropertyException(target, name);
                 }
                 if (name == null)
                     return null;
@@ -133,7 +131,7 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
     }
 
     public boolean isFirstUnknownIgnored(Map context) {
-        return true;
+        return context.containsKey(IGNORE_FIRST_UNKNOWN_KEY) && context.get(IGNORE_FIRST_UNKNOWN_KEY) == Boolean.TRUE;
     }
 
     public boolean isFirstAlwaysIgnored(Map context) {
@@ -141,7 +139,7 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
     }
 
     public boolean isUnknownIsLiteral(Map context) {
-        return true;
+        return false;
     }
 
     public void checkSetGenericTypes(Map context, Type[] genericTypes, int level) {

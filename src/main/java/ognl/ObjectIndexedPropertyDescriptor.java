@@ -30,6 +30,8 @@
 //--------------------------------------------------------------------------
 package ognl;
 
+import ognl.extended.OgnlPropertyDescriptor;
+
 import java.beans.*;
 import java.lang.reflect.*;
 
@@ -92,15 +94,15 @@ import java.lang.reflect.*;
  * @author Luke Blanshard (blanshlu@netscape.net)
  * @author Drew Davidson (drew@ognl.org)
  */
-public class ObjectIndexedPropertyDescriptor extends PropertyDescriptor
+public class ObjectIndexedPropertyDescriptor extends OgnlPropertyDescriptor
 {
     private Method          indexedReadMethod;
     private Method          indexedWriteMethod;
     private Class           propertyType;
 
-    public ObjectIndexedPropertyDescriptor(String propertyName, Class propertyType, Method indexedReadMethod, Method indexedWriteMethod) throws IntrospectionException
+    public ObjectIndexedPropertyDescriptor(Field field, PropertyDescriptor propertyDescriptor, Class propertyType, Method indexedReadMethod, Method indexedWriteMethod) throws IntrospectionException
     {
-        super(propertyName, null, null);
+        super(field, propertyDescriptor);
         this.propertyType = propertyType;
         this.indexedReadMethod = indexedReadMethod;
         this.indexedWriteMethod = indexedWriteMethod;

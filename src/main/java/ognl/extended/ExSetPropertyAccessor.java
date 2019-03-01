@@ -7,7 +7,9 @@ import ognl.NoSuchPropertyException;
 import ognl.OgnlContext;
 import ognl.OgnlException;
 import ognl.PropertyAccessor;
-import java.util.Iterator;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,8 +45,12 @@ implements PropertyAccessor {
         }
         else if (name instanceof Number) {
             this.decIndex(context);
+            List setArr = new ArrayList(set);
             ExListPropertyAccessor exListPropertyAccessor = new ExListPropertyAccessor();
-            return exListPropertyAccessor.getProperty(context, target, name);
+            exListPropertyAccessor.getProperty(context, setArr, name);
+            set.clear();
+            set.addAll(setArr);
+            return set;
         }
         if (level == 1 && this.isFirstUnknownIgnored(context) && target.getClass().isAssignableFrom(ognlContext.getRoot().getClass())) {
             this.shiftGenericParameters(ognlContext, level);
@@ -57,7 +63,17 @@ implements PropertyAccessor {
     public void setProperty(Map context, Object target, Object name, Object value) throws OgnlException {
         this.incIndex(context);
         Set set = (Set) target;
-        set.add(value);
+        if (name instanceof Number) {
+            this.decIndex(context);
+            ExListPropertyAccessor exListPropertyAccessor = new ExListPropertyAccessor();
+            List setArr = new ArrayList(set);
+            exListPropertyAccessor.setProperty(context, setArr, name, value);
+            set.clear();
+            set.addAll(setArr);
+        }
+        else {
+            set.add(value);
+        }
     }
 }
 

@@ -1,10 +1,5 @@
 package ognl;
 
-import static ognl.OgnlRuntime.NotFound;
-import static ognl.OgnlRuntime.SET_PREFIX;
-import static ognl.OgnlRuntime.GET_PREFIX;
-import static ognl.OgnlRuntime.IS_PREFIX;
-
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -13,11 +8,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -25,6 +16,8 @@ import ognl.extended.OgnlPropertyDescriptor;
 import ognl.internal.ClassCache;
 import ognl.internal.ClassCacheImpl;
 import org.apache.commons.lang3.reflect.FieldUtils;
+
+import static ognl.OgnlRuntime.*;
 
 public class OgnlCache {
 
@@ -269,7 +262,12 @@ public class OgnlCache {
                 if ((result = (Map) _propertyDescriptorCache.get(targetClass)) == null) {
                     PropertyDescriptor[] pda = Introspector.getBeanInfo(targetClass).getPropertyDescriptors();
 
-                    Map<String, Field> fieldMap = FieldUtils.getAllFieldsList(targetClass).stream().collect(Collectors.toMap(Field::getName, x -> x));
+                    List<Field> fieldList = FieldUtils.getAllFieldsList(targetClass);
+                    Map<String, Field> fieldMap = new HashMap<>();
+                    for (int i = fieldList.size() - 1; i >= 0; i--) {
+                        fieldMap.put(fieldList.get(i).getName(), fieldList.get(0));
+                    }
+
                     result = new HashMap(101);
                     for (int i = 0, icount = pda.length; i < icount; i++) {
                         // workaround for Introspector bug 6528714 (bugs.sun.com)
@@ -285,7 +283,7 @@ public class OgnlCache {
                         result.put(pda[i].getName(), new OgnlPropertyDescriptor(fieldMap.get(pda[i].getName()), pda[i]));
                     }
 
-                    OgnlRuntime.findObjectIndexedPropertyDescriptors(targetClass, result);
+                    findObjectIndexedPropertyDescriptors(targetClass, result, fieldMap);
                     _propertyDescriptorCache.put(targetClass, result);
                 }
             }
@@ -588,6 +586,114 @@ public class OgnlCache {
 
             return methodsByPropertyName.containsKey(propertyName);
         }
+    }
 
+    void findObjectIndexedPropertyDescriptors(Class targetClass, Map intoMap, Map<String, Field> fieldMap) throws OgnlException {
+        Map allMethods = getMethods(targetClass, false);
+        Map pairs = new HashMap(101);
+
+        for (Iterator it = allMethods.keySet().iterator(); it.hasNext(); ) {
+            String methodName = (String) it.next();
+            List methods = (List) allMethods.get(methodName);
+
+            /*
+             * Only process set/get where there is exactly one implementation of the method
+             * per class and those implementations are all the same
+             */
+            if (indexMethodCheck(methods)) {
+                boolean isGet = false, isSet = false;
+                Method m = (Method) methods.get(0);
+
+                if (((isSet = methodName.startsWith(SET_PREFIX)) || (isGet = methodName.startsWith(GET_PREFIX)))
+                        && (methodName.length() > 3)) {
+                    String propertyName = Introspector.decapitalize(methodName.substring(3));
+                    Class[] parameterTypes = getParameterTypes(m);
+                    int parameterCount = parameterTypes.length;
+
+                    if (isGet && (parameterCount == 1) && (m.getReturnType() != Void.TYPE)) {
+                        List pair = (List) pairs.get(propertyName);
+
+                        if (pair == null) {
+                            pairs.put(propertyName, pair = new ArrayList());
+                        }
+                        pair.add(m);
+                    }
+                    if (isSet && (parameterCount == 2) && (m.getReturnType() == Void.TYPE)) {
+                        List pair = (List) pairs.get(propertyName);
+
+                        if (pair == null) {
+                            pairs.put(propertyName, pair = new ArrayList());
+                        }
+                        pair.add(m);
+                    }
+                }
+            }
+        }
+
+        for (Iterator it = pairs.keySet().iterator(); it.hasNext(); ) {
+            String propertyName = (String) it.next();
+            List methods = (List) pairs.get(propertyName);
+
+            if (methods.size() == 2) {
+                Method method1 = (Method) methods.get(0), method2 = (Method) methods.get(1),
+                        setMethod = (method1.getParameterTypes().length == 2) ? method1 : method2,
+                        getMethod = (setMethod == method1) ? method2 : method1;
+                Class keyType = getMethod.getParameterTypes()[0], propertyType = getMethod.getReturnType();
+
+                if (keyType == setMethod.getParameterTypes()[0]) {
+                    if (propertyType == setMethod.getParameterTypes()[1]) {
+                        ObjectIndexedPropertyDescriptor propertyDescriptor;
+
+                        try {
+                            PropertyDescriptor descriptor = new PropertyDescriptor(propertyName, propertyType, null, null);
+                            propertyDescriptor = new ObjectIndexedPropertyDescriptor(fieldMap.get(propertyName), descriptor, propertyType, getMethod,
+                                    setMethod);
+                        } catch (Exception ex) {
+                            throw new OgnlException(
+                                    "creating object indexed property descriptor for '" + propertyName + "' in " + targetClass, ex);
+                        }
+                        intoMap.put(propertyName, propertyDescriptor);
+                    }
+                }
+
+            }
+        }
+    }
+
+    private boolean indexMethodCheck(List methods) {
+        boolean result = false;
+
+        if (methods.size() > 0) {
+            Method fm = (Method) methods.get(0);
+            Class[] fmpt = getParameterTypes(fm);
+            int fmpc = fmpt.length;
+            Class lastMethodClass = fm.getDeclaringClass();
+
+            result = true;
+            for (int i = 1; result && (i < methods.size()); i++) {
+                Method m = (Method) methods.get(i);
+                Class c = m.getDeclaringClass();
+
+                // Check to see if more than one method implemented per class
+                if (lastMethodClass == c) {
+                    result = false;
+                } else {
+                    Class[] mpt = getParameterTypes(fm);
+                    int mpc = fmpt.length;
+
+                    if (fmpc != mpc) {
+                        result = false;
+                    }
+                    for (int j = 0; j < fmpc; j++) {
+                        if (fmpt[j] != mpt[j]) {
+                            result = false;
+                            break;
+                        }
+                    }
+                }
+                lastMethodClass = c;
+            }
+        }
+        return result;
     }
 }
