@@ -33,6 +33,7 @@ package ognl;
 import ognl.enhance.ExpressionCompiler;
 import ognl.enhance.OrderedReturn;
 import ognl.enhance.UnsupportedCompilationException;
+import ognl.extended.Config;
 
 import java.lang.reflect.Array;
 
@@ -148,7 +149,7 @@ public class ASTChain extends SimpleNode implements NodeType, OrderedReturn
             throws OgnlException
     {
         boolean handled = false;
-
+        context.put(Config.EXPRESSION_SET, value);
         for(int i = 0, ilast = _children.length - 2; i <= ilast; ++i)
         {
             if (i <= ilast) {

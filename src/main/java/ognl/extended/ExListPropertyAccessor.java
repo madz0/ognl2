@@ -3,17 +3,14 @@
  */
 package ognl.extended;
 
-import ognl.DynamicSubscript;
-import ognl.NoSuchPropertyException;
-import ognl.OgnlContext;
-import ognl.OgnlException;
-import ognl.PropertyAccessor;
+import ognl.*;
 
 import java.util.*;
 
 public class ExListPropertyAccessor
 extends ExObjectPropertyAccessor
 implements PropertyAccessor {
+    private PropertyAccessor propertyAccessor = new ListPropertyAccessor();
     @Override
     public Object getProperty(Map context, Object target, Object name) throws OgnlException {
       OgnlContext ognlContext = (OgnlContext) context;
@@ -244,6 +241,16 @@ implements PropertyAccessor {
             set.clear();
             set.addAll(list);
         }
+    }
+
+    @Override
+    public String getSourceAccessor(OgnlContext context, Object target, Object index) {
+        return propertyAccessor.getSourceAccessor(context, target, index);
+    }
+
+    @Override
+    public String getSourceSetter(OgnlContext context, Object target, Object index) {
+        return propertyAccessor.getSourceSetter(context, target, index);
     }
 }
 

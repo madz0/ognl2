@@ -29,12 +29,12 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
             int level = this.incIndex(context);
             if (level == 1 && this.isFirstAlwaysIgnored(context)
                     && target.getClass().isAssignableFrom(ognlContext.getRoot().getClass())) {
-                return processObject(ognlContext, target, null, null, context.get(Config.NEXT_CHAIN)!=null?target:name);
+                return processObject(ognlContext, target, null, null, context.get(Config.NEXT_CHAIN) != null ? target : name);
             }
             if (!this.hasGetProperty(context, target, name)) {
                 if (level == 1 && this.isFirstUnknownIgnored(context)
                         && target.getClass().isAssignableFrom(ognlContext.getRoot().getClass())) {
-                    return processObject(ognlContext, target, null, null, context.get(Config.NEXT_CHAIN)!=null?target:name);
+                    return processObject(ognlContext, target, null, null, context.get(Config.NEXT_CHAIN) != null ? target : name);
                 }
                 if (!this.isUnknownIsLiteral(context)) {
                     StringBuffer sb = new StringBuffer();
@@ -80,7 +80,7 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
                 }
             }
             value = processObject(ognlContext, target, (String) name, name, value);
-            setProperty(context, target, name, value);
+            setPropertyLoose(ognlContext, target, (String) name, value);
             return value;
         } catch (Exception e) {
             e.printStackTrace();
@@ -121,7 +121,7 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
     }
 
     public boolean isNullInited(Map context) {
-        return true;
+        return context.containsKey(Config.EXPRESSION_SET);
     }
 
     public boolean isExpanded(Map context) {
@@ -155,7 +155,7 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
                 return;
             }
             StringBuffer key = new StringBuffer();
-            key.append(GENERIC_PREFIX_KEY).append(genericTypes.length);
+            key.append(GENERIC_PREFIX_KEY).append(level + 1);
             context.put(key.toString(), (Object) genericTypes);
         } else if (genericTypes[0] instanceof GenericArrayType) {
             GenericArrayType genericArrayType = (GenericArrayType) genericTypes[0];
@@ -191,11 +191,10 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
         if (nameForBeanProperty != null) {
             try {
                 propertyDescriptorValue = OgnlRuntime.getPropertyDescriptor(target.getClass(), nameForBeanProperty);
-            } catch (IntrospectionException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
             }
         }
-        if(propertyDescriptorValue == null) {
+        if (propertyDescriptorValue == null) {
             propertyDescriptorValue = new OgnlPropertyDescriptor(name);
         }
         return ((ObjectConstructor) context.get(OBJECT_CONSTRUCTOR_KEY)).processObject(
@@ -282,4 +281,10 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
         context.put(key.toString(), a);
     }
 
+    private void setPropertyLoose(OgnlContext context, Object target, Object name, Object value) {
+        try {
+            setPossibleProperty(context, target, (String) name, value);
+        } catch (Exception e) {
+        }
+    }
 }

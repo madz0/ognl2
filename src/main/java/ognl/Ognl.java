@@ -277,6 +277,7 @@ public abstract class Ognl {
         }
 
         result.setRoot(root);
+        result.extend();
         return result;
     }
 
@@ -758,6 +759,7 @@ public abstract class Ognl {
             if (cNode.getName() != null) {
                 context.put(Config.NEXT_CHAIN, cNode);
                 context.put(CURRENT_INDEX_KEY, new MutableInt(level));
+                context.put(Config.EXPRESSION_SET, Boolean.TRUE);
                 if (cNode.getValue() == null) {
                     getValue(parseExpression(cNode.getName()), context, root, null);
                 } else {

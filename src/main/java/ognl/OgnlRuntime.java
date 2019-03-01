@@ -151,18 +151,9 @@ public class OgnlRuntime {
 
     static final Map _primitiveTypes = new HashMap(101);
 
-    static final Map _methodParameterTypesCache = new HashMap(101);
-    static final Map _genericMethodParameterTypesCache = new HashMap(101);
-    static final Map _ctorParameterTypesCache = new HashMap(101);
     static SecurityManager _securityManager = System.getSecurityManager();
     static final EvaluationPool _evaluationPool = new EvaluationPool();
     static final ObjectArrayPool _objectArrayPool = new ObjectArrayPool();
-
-    static final Map<Method, Boolean> _methodAccessCache = new ConcurrentHashMap<Method, Boolean>();
-    static final Map<Method, Boolean> _methodPermCache = new ConcurrentHashMap<Method, Boolean>();
-
-    static final ClassPropertyMethodCache cacheSetMethod = new ClassPropertyMethodCache();
-    static final ClassPropertyMethodCache cacheGetMethod = new ClassPropertyMethodCache();
 
     static final OgnlCache cache = new OgnlCache();
     /**
@@ -369,11 +360,7 @@ public class OgnlRuntime {
      * </p>
      */
     public static void clearCache() {
-        _methodParameterTypesCache.clear();
-        _ctorParameterTypesCache.clear();
-        //
-        _methodAccessCache.clear();
-        _methodPermCache.clear();
+        cache.clearCache();
     }
 
     /**
@@ -572,11 +559,11 @@ public class OgnlRuntime {
      * Returns the parameter types of the given method.
      */
     public static Class[] getParameterTypes(Method m) {
-        synchronized (_methodParameterTypesCache) {
+        synchronized (cache._methodParameterTypesCache) {
             Class[] result;
 
-            if ((result = (Class[]) _methodParameterTypesCache.get(m)) == null) {
-                _methodParameterTypesCache.put(m, result = m.getParameterTypes());
+            if ((result = (Class[]) cache._methodParameterTypesCache.get(m)) == null) {
+                cache._methodParameterTypesCache.put(m, result = m.getParameterTypes());
             }
             return result;
         }
@@ -618,7 +605,7 @@ public class OgnlRuntime {
             return getParameterTypes(m);
         }
 
-        if ((types = (Class[]) _genericMethodParameterTypesCache.get(m)) != null) {
+        if ((types = (Class[]) cache._genericMethodParameterTypesCache.get(m)) != null) {
             ParameterizedType genericSuperclass = (ParameterizedType) typeGenericSuperclass;
             if (Arrays.equals(types, genericSuperclass.getActualTypeArguments())) {
                 return types;
@@ -659,8 +646,8 @@ public class OgnlRuntime {
             types[i] = m.getParameterTypes()[i];
         }
 
-        synchronized (_genericMethodParameterTypesCache) {
-            _genericMethodParameterTypesCache.put(m, types);
+        synchronized (cache._genericMethodParameterTypesCache) {
+            cache._genericMethodParameterTypesCache.put(m, types);
         }
 
         return types;
@@ -711,10 +698,10 @@ public class OgnlRuntime {
      */
     public static Class[] getParameterTypes(Constructor c) {
         Class[] result;
-        if ((result = (Class[]) _ctorParameterTypesCache.get(c)) == null) {
-            synchronized (_ctorParameterTypesCache) {
-                if ((result = (Class[]) _ctorParameterTypesCache.get(c)) == null) {
-                    _ctorParameterTypesCache.put(c, result = c.getParameterTypes());
+        if ((result = (Class[]) cache._ctorParameterTypesCache.get(c)) == null) {
+            synchronized (cache._ctorParameterTypesCache) {
+                if ((result = (Class[]) cache._ctorParameterTypesCache.get(c)) == null) {
+                    cache._ctorParameterTypesCache.put(c, result = c.getParameterTypes());
                 }
             }
         }
@@ -763,36 +750,36 @@ public class OgnlRuntime {
         // only synchronize method invocation if it actually requires it
 
         synchronized (method) {
-            if (_methodAccessCache.get(method) == null) {
+            if (cache._methodAccessCache.get(method) == null) {
                 if (!Modifier.isPublic(method.getModifiers())
                         || !Modifier.isPublic(method.getDeclaringClass().getModifiers())) {
                     if (!(((AccessibleObject) method).isAccessible())) {
-                        _methodAccessCache.put(method, Boolean.TRUE);
+                        cache._methodAccessCache.put(method, Boolean.TRUE);
                     } else {
-                        _methodAccessCache.put(method, Boolean.FALSE);
+                        cache._methodAccessCache.put(method, Boolean.FALSE);
                     }
                 } else {
-                    _methodAccessCache.put(method, Boolean.FALSE);
+                    cache._methodAccessCache.put(method, Boolean.FALSE);
                 }
             }
-            if (_methodAccessCache.get(method) == Boolean.TRUE) {
+            if (cache._methodAccessCache.get(method) == Boolean.TRUE) {
                 syncInvoke = true;
             }
 
-            if (_methodPermCache.get(method) == null) {
+            if (cache._methodPermCache.get(method) == null) {
                 if (_securityManager != null) {
                     try {
                         _securityManager.checkPermission(getPermission(method));
-                        _methodPermCache.put(method, Boolean.TRUE);
+                        cache._methodPermCache.put(method, Boolean.TRUE);
                     } catch (SecurityException ex) {
-                        _methodPermCache.put(method, Boolean.FALSE);
+                        cache._methodPermCache.put(method, Boolean.FALSE);
                         throw new IllegalAccessException("Method [" + method + "] cannot be accessed.");
                     }
                 } else {
-                    _methodPermCache.put(method, Boolean.TRUE);
+                    cache._methodPermCache.put(method, Boolean.TRUE);
                 }
             }
-            if (_methodPermCache.get(method) == Boolean.FALSE) {
+            if (cache._methodPermCache.get(method) == Boolean.FALSE) {
                 throw new IllegalAccessException("Method [" + method + "] cannot be accessed.");
             }
         }
@@ -1847,17 +1834,17 @@ public class OgnlRuntime {
             throws IntrospectionException, OgnlException {
         // Cache is a map in two levels, so we provide two keys (see comments in
         // ClassPropertyMethodCache below)
-        Method method = cacheGetMethod.get(targetClass, propertyName);
+        Method method = cache.cacheGetMethod.get(targetClass, propertyName);
         if (method != null)
             return method;
 
         // By checking key existence now and not before calling 'get', we will save a
         // map resolution 90% of the times
-        if (cacheGetMethod.containsKey(targetClass, propertyName))
+        if (cache.cacheGetMethod.containsKey(targetClass, propertyName))
             return null;
 
         method = _getGetMethod(context, targetClass, propertyName); // will be null if not found - will cache it anyway
-        cacheGetMethod.put(targetClass, propertyName, method);
+        cache.cacheGetMethod.put(targetClass, propertyName, method);
 
         return method;
     }
@@ -1899,17 +1886,17 @@ public class OgnlRuntime {
             throws IntrospectionException, OgnlException {
         // Cache is a map in two levels, so we provide two keys (see comments in
         // ClassPropertyMethodCache below)
-        Method method = cacheSetMethod.get(targetClass, propertyName);
+        Method method = cache.cacheSetMethod.get(targetClass, propertyName);
         if (method != null)
             return method;
 
         // By checking key existence now and not before calling 'get', we will save a
         // map resolution 90% of the times
-        if (cacheSetMethod.containsKey(targetClass, propertyName))
+        if (cache.cacheSetMethod.containsKey(targetClass, propertyName))
             return null;
 
         method = _getSetMethod(context, targetClass, propertyName); // will be null if not found - will cache it anyway
-        cacheSetMethod.put(targetClass, propertyName, method);
+        cache.cacheSetMethod.put(targetClass, propertyName, method);
 
         return method;
     }
@@ -2207,7 +2194,7 @@ public class OgnlRuntime {
                 if (pd.isIndexedPropertyDescriptor()) {
                     result = INDEXED_PROPERTY_INT;
                 } else if (pd.isObjectIndexedPropertyDescriptor()) {
-                        result = INDEXED_PROPERTY_OBJECT;
+                    result = INDEXED_PROPERTY_OBJECT;
                 }
             }
         } catch (Exception ex) {
@@ -2674,77 +2661,6 @@ public class OgnlRuntime {
         return source;
     }
 
-    /*
-     * The idea behind this class is to provide a very fast way to cache
-     * getter/setter methods indexed by their class and property name.
-     *
-     * Instead of creating any kind of complex key object (or a String key by
-     * appending class name and property), this class directly uses the Class clazz
-     * and the String propertyName as keys of two levels of ConcurrentHashMaps, so
-     * that it takes advantage of the fact that these two classes are immutable and
-     * that their respective hashCode() and equals() methods are extremely fast and
-     * optimized. These two aspects should improve Map access performance.
-     *
-     * Also, using these structure instead of any other kind of key on a
-     * single-level map should save a lot of memory given no specialized cache
-     * objects (be them of a specific CacheKey class or mere Strings) ever have to
-     * be created for simply accessing the cache in search for a getter/setter
-     * method.
-     *
-     */
-    private static final class ClassPropertyMethodCache {
-
-        // ConcurrentHashMaps do not allow null keys or values, so we will use one of
-        // this class's own methods as
-        // a replacement for signaling when the true cached value is 'null'
-        private static final Method NULL_REPLACEMENT;
-
-        private final ConcurrentHashMap<Class<?>, ConcurrentHashMap<String, Method>> cache = new ConcurrentHashMap<Class<?>, ConcurrentHashMap<String, Method>>();
-
-        static {
-            try {
-                NULL_REPLACEMENT = ClassPropertyMethodCache.class.getDeclaredMethod("get",
-                        new Class[]{Class.class, String.class});
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e); // Will never happen, it's our own method, we know it exists
-            }
-        }
-
-        ClassPropertyMethodCache() {
-            super();
-        }
-
-        Method get(Class clazz, String propertyName) {
-            ConcurrentHashMap<String, Method> methodsByPropertyName = this.cache.get(clazz);
-            if (methodsByPropertyName == null) {
-                methodsByPropertyName = new ConcurrentHashMap<String, Method>();
-                this.cache.put(clazz, methodsByPropertyName);
-            }
-            Method method = methodsByPropertyName.get(propertyName);
-            if (method == NULL_REPLACEMENT)
-                return null;
-            return method;
-        }
-
-        void put(Class clazz, String propertyName, Method method) {
-            ConcurrentHashMap<String, Method> methodsByPropertyName = this.cache.get(clazz);
-            if (methodsByPropertyName == null) {
-                methodsByPropertyName = new ConcurrentHashMap<String, Method>();
-                this.cache.put(clazz, methodsByPropertyName);
-            }
-            methodsByPropertyName.put(propertyName, (method == null ? NULL_REPLACEMENT : method));
-        }
-
-        boolean containsKey(Class clazz, String propertyName) {
-            ConcurrentHashMap<String, Method> methodsByPropertyName = this.cache.get(clazz);
-            if (methodsByPropertyName == null)
-                return false;
-
-            return methodsByPropertyName.containsKey(propertyName);
-        }
-
-    }
-
     public static boolean isPrimitiveOrWrapper(Type type) {
         if (type instanceof Class) {
             Class cls = (Class) type;
@@ -2765,8 +2681,7 @@ public class OgnlRuntime {
             throws InstantiationException, IllegalAccessException {
         if (context != null) {
             return ((ObjectConstructor) context.get(Config.OBJECT_CONSTRUCTOR_KEY)).createObject(cls, componentType, node);
-        }
-        else {
+        } else {
             ObjectConstructor objectConstructor = new DefaultObjectConstructor();
             return objectConstructor.createObject(cls, componentType, node);
         }

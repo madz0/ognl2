@@ -11,21 +11,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ognl.DynamicSubscript;
-import ognl.NoSuchPropertyException;
-import ognl.OgnlContext;
-import ognl.OgnlException;
-import ognl.OgnlRuntime;
-import ognl.PropertyAccessor;
-import ognl.TypeConverter;
+import ognl.*;
 import ognl.internal.extended.ArraySourceContainer;
 
 public class ExArrayPropertyAccessor
-extends ExObjectPropertyAccessor
-implements PropertyAccessor {
+        extends ExObjectPropertyAccessor
+        implements PropertyAccessor {
+    private PropertyAccessor arrayPropertyAccessor = new ArrayPropertyAccessor();
     @Override
     public Object getProperty(Map context, Object target, Object name) throws OgnlException {
-      OgnlContext ognlContext = (OgnlContext) context;
+        OgnlContext ognlContext = (OgnlContext) context;
         int level = this.incIndex(context);
         if (level == 1 && this.isFirstAlwaysIgnored(context) && ognlContext.getRoot().getClass().isArray()) {
             return target;
@@ -44,7 +39,7 @@ implements PropertyAccessor {
             Object index = name;
             if (index instanceof DynamicSubscript) {
                 int len = Array.getLength(target);
-                switch (((DynamicSubscript)index).getFlag()) {
+                switch (((DynamicSubscript) index).getFlag()) {
                     case 3: {
                         result = Array.newInstance(target.getClass().getComponentType(), len);
                         System.arraycopy(target, 0, result, 0, len);
@@ -66,12 +61,12 @@ implements PropertyAccessor {
                         break;
                     }
                 }
-            } else if (index instanceof Number && ((Number)index).intValue() < 0) {
+            } else if (index instanceof Number && ((Number) index).intValue() < 0) {
                 throw new NoSuchPropertyException(target, index);
             }
             if (result == null) {
                 if (index instanceof Number) {
-                    int i = ((Number)index).intValue();
+                    int i = ((Number) index).intValue();
                     if (!this.isSetChain(context)) {
                         return i >= 0 ? Array.get(target, i) : null;
                     }
@@ -98,8 +93,7 @@ implements PropertyAccessor {
                             value = this.createProperObject(ognlContext, cls, cls.getComponentType());
                             Array.set(target, i, value);
                             return value;
-                        }
-                        catch (IllegalAccessException | InstantiationException e) {
+                        } catch (IllegalAccessException | InstantiationException e) {
                             e.printStackTrace();
                             return null;
                         }
@@ -127,8 +121,7 @@ implements PropertyAccessor {
                         Array.set(new_array, i, result);
                         this.setExpandedArray(ognlContext, new_array, i, level, true);
                         return result;
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                         return null;
                     }
@@ -141,7 +134,7 @@ implements PropertyAccessor {
 
     @Override
     public void setProperty(Map context, Object target, Object name, Object value) throws OgnlException {
-OgnlContext ognlContext = (OgnlContext) context;
+        OgnlContext ognlContext = (OgnlContext) context;
         int level = this.incIndex(context);
         boolean isNumber = name instanceof Number;
         if (isNumber || name instanceof DynamicSubscript) {
@@ -150,7 +143,7 @@ OgnlContext ognlContext = (OgnlContext) context;
             int len = Array.getLength(target);
             boolean isExpanded = this.isExpanded(context);
             if (isNumber) {
-                int i = ((Number)name).intValue();
+                int i = ((Number) name).intValue();
                 if (len > i && i >= 0) {
                     Array.set(target, i, convertedValue);
                     return;
@@ -159,14 +152,14 @@ OgnlContext ognlContext = (OgnlContext) context;
                     return;
                 }
                 Class<?> component_type = target.getClass().getComponentType();
-                Object[] array = (Object[])target;
-                Object[] new_array = (Object[])Array.newInstance(component_type, i + 1);
+                Object[] array = (Object[]) target;
+                Object[] new_array = (Object[]) Array.newInstance(component_type, i + 1);
                 System.arraycopy(array, 0, new_array, 0, len);
                 Array.set(new_array, i, value);
                 this.setExpandedArray(ognlContext, new_array, i, level, true);
                 return;
             }
-            switch (((DynamicSubscript)name).getFlag()) {
+            switch (((DynamicSubscript) name).getFlag()) {
                 case 3: {
                     System.arraycopy(target, 0, convertedValue, 0, len);
                     return;
@@ -180,24 +173,32 @@ OgnlContext ognlContext = (OgnlContext) context;
         }
     }
 
+    public String getSourceAccessor(OgnlContext context, Object target, Object index) {
+       return arrayPropertyAccessor.getSourceAccessor(context, target, index);
+    }
+
+    public String getSourceSetter(OgnlContext context, Object target, Object index) {
+        return arrayPropertyAccessor.getSourceSetter(context, target, index);
+    }
+
     private void setExpandedArray(OgnlContext context, Object array, int index, int level, boolean can_save) {
         StringBuffer key = new StringBuffer();
-        key.append(ARRAR_SOURCE_PREFIX_KEY).append(String.valueOf(level));
-        ArraySourceContainer setterContainer = (ArraySourceContainer)context.get(String.valueOf(key.toString()));
+        key.append(ARRAR_SOURCE_PREFIX_KEY).append(level);
+        ArraySourceContainer setterContainer = (ArraySourceContainer) context.get(key.toString());
         if (setterContainer != null) {
             Object source = setterContainer.getSourece();
             if (source != null) {
                 if (source.getClass().isArray()) {
-                    Array.set(source, (Integer)setterContainer.getIndex(), array);
+                    Array.set(source, (Integer) setterContainer.getIndex(), array);
                     setterContainer.setSource(array);
                     setterContainer.setIndex(index);
                 } else if (source instanceof List) {
-                    ((List)source).set((Integer)setterContainer.getIndex(), array);
+                    ((List) source).set((Integer) setterContainer.getIndex(), array);
                 } else if (source instanceof Map) {
-                    ((Map)source).put((String)setterContainer.getIndex(), array);
+                    ((Map) source).put((String) setterContainer.getIndex(), array);
                 } else if (source instanceof Set) {
-                    ((Set)source).clear();
-                    ((Set)source).add(array);
+                    ((Set) source).clear();
+                    ((Set) source).add(array);
                 }
                 setterContainer.setIndex(index);
                 setterContainer.setSource(array);
@@ -208,15 +209,14 @@ OgnlContext ognlContext = (OgnlContext) context;
                     }
                     setterContainer.setSource(array);
                     setterContainer.setIndex(index);
-                }
-                catch (OgnlException | IntrospectionException | IllegalAccessException | NoSuchMethodException e) {
+                } catch (OgnlException | IntrospectionException | IllegalAccessException | NoSuchMethodException e) {
                     e.printStackTrace();
                 }
             }
             key = new StringBuffer();
             key.append(ARRAR_SOURCE_PREFIX_KEY).append(String.valueOf(level + 1));
-            context.put(key.toString(), (Object)setterContainer);
-        } else if (context.getRoot().getClass().isArray()) {
+            context.put(key.toString(), (Object) setterContainer);
+        } else if (context.getRoot() != null && context.getRoot().getClass().isArray()) {
             context.put(EXPANDED_ARRAY_KEY, array);
             ArraySourceContainer a = new ArraySourceContainer();
             a.setSource(array);
@@ -224,6 +224,5 @@ OgnlContext ognlContext = (OgnlContext) context;
             context.put(key.toString(), a);
         }
     }
-
 }
 

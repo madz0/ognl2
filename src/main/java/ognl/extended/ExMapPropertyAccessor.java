@@ -3,11 +3,8 @@
  */
 package ognl.extended;
 
-import ognl.ASTProperty;
-import ognl.Node;
-import ognl.OgnlContext;
-import ognl.OgnlException;
-import ognl.PropertyAccessor;
+import ognl.*;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +12,7 @@ import java.util.Set;
 public class ExMapPropertyAccessor
 extends ExObjectPropertyAccessor
 implements PropertyAccessor {
+    private PropertyAccessor mapPropertyAccessor = new MapPropertyAccessor();
     @Override
     public Object getProperty(Map context, Object target, Object name) throws OgnlException {
         Object result;
@@ -122,6 +120,16 @@ implements PropertyAccessor {
     @Override
     public int getGenericArgumentsCount() {
         return 2;
+    }
+
+    @Override
+    public String getSourceAccessor(OgnlContext context, Object target, Object index) {
+        return mapPropertyAccessor.getSourceAccessor(context, target, index);
+    }
+
+    @Override
+    public String getSourceSetter(OgnlContext context, Object target, Object index) {
+        return mapPropertyAccessor.getSourceSetter(context, target, index);
     }
 }
 

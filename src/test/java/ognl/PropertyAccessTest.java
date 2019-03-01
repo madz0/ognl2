@@ -22,6 +22,16 @@ public class PropertyAccessTest {
     }
 
     @Test
+    public void testTestMap() throws OgnlException {
+
+        OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
+        context.extend();
+        MyTest2 root = new MyTest2();
+        Ognl.getValue("map['name'].name=salam", context, root);
+        assertEquals("salam", root.getMap().get("name").getName());
+    }
+
+    @Test
     public void testBind() throws OgnlException {
         OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
         context.extend();
