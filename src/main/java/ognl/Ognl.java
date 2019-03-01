@@ -277,7 +277,6 @@ public abstract class Ognl {
         }
 
         result.setRoot(root);
-        result.extend();
         return result;
     }
 

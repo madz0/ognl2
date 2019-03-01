@@ -47,10 +47,10 @@ implements PropertyAccessor {
             this.decIndex(context);
             List setArr = new ArrayList(set);
             ExListPropertyAccessor exListPropertyAccessor = new ExListPropertyAccessor();
-            exListPropertyAccessor.getProperty(context, setArr, name);
+            Object obj = exListPropertyAccessor.getProperty(context, setArr, name);
             set.clear();
             set.addAll(setArr);
-            return set;
+            return obj;
         }
         if (level == 1 && this.isFirstUnknownIgnored(context) && target.getClass().isAssignableFrom(ognlContext.getRoot().getClass())) {
             this.shiftGenericParameters(ognlContext, level);

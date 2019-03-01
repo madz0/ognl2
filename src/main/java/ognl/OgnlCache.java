@@ -265,7 +265,7 @@ public class OgnlCache {
                     List<Field> fieldList = FieldUtils.getAllFieldsList(targetClass);
                     Map<String, Field> fieldMap = new HashMap<>();
                     for (int i = fieldList.size() - 1; i >= 0; i--) {
-                        fieldMap.put(fieldList.get(i).getName(), fieldList.get(0));
+                        fieldMap.put(fieldList.get(i).getName(), fieldList.get(i));
                     }
 
                     result = new HashMap(101);
