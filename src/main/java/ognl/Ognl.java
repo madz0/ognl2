@@ -771,24 +771,29 @@ public abstract class Ognl {
 
     public static <T> T getValue(List<String> expressions, Map context, Class<T> rootClass)
             throws OgnlException {
-        MapNode mapNode = tokenize(expressions);
-        try {
-            Object root = OgnlRuntime.createProperObject((OgnlContext) context, rootClass, rootClass.getComponentType(), mapNode);
-            getValue(mapNode, context, root);
-            return (T)root;
-        } catch (InstantiationException | IllegalAccessException e) {
-            return null;
+        if (expressions != null) {
+            MapNode mapNode = tokenize(expressions);
+            try {
+                Object root = OgnlRuntime.createProperObject((OgnlContext) context, rootClass, rootClass.getComponentType(), mapNode);
+                getValue(mapNode, context, root);
+                return (T) root;
+            } catch (InstantiationException | IllegalAccessException e) {
+            }
         }
+        return null;
     }
 
     public static Object getValue(List<String> expressions, Map context, Object root)
             throws OgnlException {
-        MapNode mapNode = tokenize(expressions);
-        getValue(mapNode, context, root);
+        if (expressions != null) {
+            MapNode mapNode = tokenize(expressions);
+            getValue(mapNode, context, root);
+        }
         return root;
     }
 
     private static Map<String, Token> specialTokensMap = new HashMap<>();
+
     private static class Token {
         private Boolean isPartOfName;
         private String token;
