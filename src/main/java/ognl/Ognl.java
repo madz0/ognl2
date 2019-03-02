@@ -825,7 +825,7 @@ public abstract class Ognl {
     }
 
     public static MapNode tokenize(List<String> expressions) {
-        MapNode m = new MapNode("_root_", NodeType.SINGLE);
+        MapNode m = new MapNode("_root_", NodeType.SINGLE, null);
         m.setIsRoot(true);
         for (String expr : expressions) {
             MapNode currentNode = null;
@@ -855,9 +855,10 @@ public abstract class Ognl {
                     } else {
                         childMap = currentNode.getChildren();
                     }
+                    MapNode currentHolder = currentNode;
                     currentNode = childMap.get(name.toString());
                     if (currentNode == null) {
-                        currentNode = new MapNode(name.toString(), nodeType);
+                        currentNode = new MapNode(name.toString(), nodeType, currentHolder);
                         childMap.put(name.toString(), currentNode);
                     }
                     name = new StringBuilder();

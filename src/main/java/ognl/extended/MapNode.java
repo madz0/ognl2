@@ -11,14 +11,27 @@ public class MapNode {
     private String value;
     private Ognl.NodeType nodeType;
     private Boolean isRoot = false;
+    private MapNode parent;
+    private String path;
 
-    public MapNode(String name, Ognl.NodeType nodeType) {
+    public MapNode(String name, Ognl.NodeType nodeType, MapNode parent) {
         this.name = name;
         this.nodeType = nodeType;
+        this.parent = parent;
     }
 
     public MapNode getMapping(String name) {
         return children.get(name);
+    }
+
+    public String getPath() {
+        if (path != null) {
+            return path;
+        }
+        if (parent == null) {
+            return path = name;
+        }
+        return parent.getPath() + (!parent.isCollection() ? "." : "") + name;
     }
 
     public String getName() {
