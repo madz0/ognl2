@@ -61,7 +61,7 @@ implements PropertyAccessor {
 
     @Override
     public void setProperty(Map context, Object target, Object name, Object value) throws OgnlException {
-        this.incIndex(context);
+        int level = this.incIndex(context);
         Set set = (Set) target;
         if (name instanceof Number) {
             this.decIndex(context);

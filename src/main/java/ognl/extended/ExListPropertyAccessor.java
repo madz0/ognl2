@@ -157,10 +157,14 @@ public class ExListPropertyAccessor
             super.setProperty(context, target, name, value);
             return;
         }
-        this.incIndex(context);
+        int level = this.incIndex(context);
         List list = (List) target;
         boolean isExpanded = this.isExpanded(context);
         if (name instanceof Number) {
+            Object clsObj = this.getParameterizedType((OgnlContext) context, level, 0);
+            if(clsObj!=null) {
+                value = OgnlOps.convertValue(value, (Class) clsObj);
+            }
             int index = ((Number) name).intValue();
             if (list.size() > index) {
                 list.set(index, value);

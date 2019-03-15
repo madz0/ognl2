@@ -337,6 +337,20 @@ public abstract class OgnlOps implements NumericTypes {
         return null;
     }
 
+    public static <T extends Enum<T>> Enum<T> enumValue(Object value, Class<T> enumType) {
+        if (value.getClass() == enumType) {
+            return (Enum<T>) value;
+        }
+        if (value instanceof String) {
+            for (Enum<T> candidate : enumType.getEnumConstants()) {
+                if (candidate.name().equalsIgnoreCase((String) value)) {
+                    return candidate;
+                }
+            }
+        }
+        return null;
+    }
+
     /**
      * Returns a constant from the NumericTypes interface that represents the numeric type of the
      * given object.
@@ -583,19 +597,22 @@ public abstract class OgnlOps implements NumericTypes {
                         throw new IllegalArgumentException(e);
                     }
                 }
-                if (toType == java.sql.Date.class) {
+                else if (toType == java.sql.Date.class) {
                     try {
                         result = sqlDateValue(value);
                     } catch (ParseException e) {
                         throw new IllegalArgumentException(e);
                     }
                 }
-                if(toType == java.sql.Time.class) {
+                else if(toType == java.sql.Time.class) {
                     try {
                         result = sqlTimeValue(value);
                     } catch (ParseException e) {
                         throw new IllegalArgumentException(e);
                     }
+                }
+                else if(Enum.class.isAssignableFrom(toType)) {
+                    result = enumValue(value, toType);
                 }
             }
         } else {
