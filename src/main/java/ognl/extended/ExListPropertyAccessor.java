@@ -90,13 +90,13 @@ public class ExListPropertyAccessor
                     this.keepArraySource(ognlContext, target, index, level);
                 }
                 if (value != null || !isnullInited) {
-                    value = processObject(ognlContext, target, null, name, value);
+                    value = processObjectForGet(ognlContext, target, null, name, value);
                     list.set(index, value);
                     return value;
                 }
                 if (clsObj == null) {
                     if (this.isUnknownInited(context)) {
-                        value = processObject(ognlContext, target, null, name, new Object());
+                        value = processObjectForGet(ognlContext, target, null, name, new Object());
                         list.set(index, value);
                         return value;
                     }
@@ -105,7 +105,7 @@ public class ExListPropertyAccessor
                 Class cls = (Class) clsObj;
                 try {
                     value = this.createProperObject(ognlContext, cls, cls.getComponentType());
-                    value = processObject(ognlContext, target, null, name, value);
+                    value = processObjectForGet(ognlContext, target, null, name, value);
                     if (cls.isArray()) {
                         this.keepArraySource(ognlContext, target, index, level);
                     }
@@ -113,22 +113,22 @@ public class ExListPropertyAccessor
                     return value;
                 } catch (IllegalAccessException | InstantiationException e) {
                     e.printStackTrace();
-                    return processObject(ognlContext, target, null, name, null);
+                    return processObjectForGet(ognlContext, target, null, name, null);
                 }
             }
             if (!isExpanded) {
-                return processObject(ognlContext, target, null, name, null);
+                return processObjectForGet(ognlContext, target, null, name, null);
             }
             for (int i = list.size(); i <= index; ++i) {
                 list.add(null);
             }
             if (!isnullInited) {
-                return processObject(ognlContext, target, null, name, null);
+                return processObjectForGet(ognlContext, target, null, name, null);
             }
             Object clsObj = this.getParameterizedType(ognlContext, level, 0);
             if (clsObj == null) {
                 if (this.isUnknownInited(context)) {
-                    value = processObject(ognlContext, target, null, name, new Object());
+                    value = processObjectForGet(ognlContext, target, null, name, new Object());
                     list.set(index, value);
                     return value;
                 }
@@ -137,7 +137,7 @@ public class ExListPropertyAccessor
             Class cls = (Class) clsObj;
             try {
                 value = this.createProperObject(ognlContext, cls, cls.getComponentType());
-                value = processObject(ognlContext, target, null, name, value);
+                value = processObjectForGet(ognlContext, target, null, name, value);
                 if (cls.isArray()) {
                     this.keepArraySource(ognlContext, target, index, level);
                 }
@@ -145,10 +145,10 @@ public class ExListPropertyAccessor
                 return value;
             } catch (IllegalAccessException | InstantiationException e) {
                 e.printStackTrace();
-                return processObject(ognlContext, target, null, name, null);
+                return processObjectForGet(ognlContext, target, null, name, null);
             }
         }
-        return processObject(ognlContext, target, null, name, null);
+        return processObjectForGet(ognlContext, target, null, name, null);
     }
 
     @Override

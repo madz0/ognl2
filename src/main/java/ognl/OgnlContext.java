@@ -603,7 +603,7 @@ public class OgnlContext extends Object implements Map {
         extend();
     }
 
-    public void addObjectConstructor(ObjectConstructor constructor) {
+    public void setObjectConstructor(ObjectConstructor constructor) {
         put(OBJECT_CONSTRUCTOR_KEY, constructor);
     }
 

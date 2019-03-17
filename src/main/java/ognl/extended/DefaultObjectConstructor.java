@@ -56,8 +56,8 @@ public class DefaultObjectConstructor implements ObjectConstructor {
     }
 
     @Override
-    public Object processObject(OgnlContext context, Object root, OgnlPropertyDescriptor propertyDescriptor,
-                                Object propertyObject, MapNode node) {
+    public Object processObjectForGet(OgnlContext context, Object root, OgnlPropertyDescriptor propertyDescriptor,
+                                      Object propertyObject, MapNode node) {
         if (node != null) {
             context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
             if (node.isCollection() && propertyDescriptor.isPropertyDescriptor()) {
@@ -65,12 +65,18 @@ public class DefaultObjectConstructor implements ObjectConstructor {
             } else {
                 context.extend();
             }
+            context.setObjectConstructor(this);
             try {
                 Ognl.getValue(node, context, propertyObject);
             } catch (OgnlException e) {
                 e.printStackTrace();
             }
         }
+        return propertyObject;
+    }
+
+    @Override
+    public Object processObjectForSet(OgnlContext context, Object root, OgnlPropertyDescriptor propertyDescriptor, Object propertyObject, MapNode node) throws PropertySetIgnoreException {
         return propertyObject;
     }
 }

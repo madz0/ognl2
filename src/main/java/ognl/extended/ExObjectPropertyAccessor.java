@@ -3,7 +3,6 @@
  */
 package ognl.extended;
 
-import java.beans.IntrospectionException;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
@@ -29,12 +28,12 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
             int level = this.incIndex(context);
             if (level == 1 && this.isFirstAlwaysIgnored(context)
                     && target.getClass().isAssignableFrom(ognlContext.getRoot().getClass())) {
-                return processObject(ognlContext, target, null, null, context.get(Config.NEXT_CHAIN) != null ? target : name);
+                return processObjectForGet(ognlContext, target, null, null, context.get(Config.NEXT_CHAIN) != null ? target : name);
             }
             if (!this.hasGetProperty(context, target, name)) {
                 if (level == 1 && this.isFirstUnknownIgnored(context)
                         && target.getClass().isAssignableFrom(ognlContext.getRoot().getClass())) {
-                    return processObject(ognlContext, target, null, null, context.get(Config.NEXT_CHAIN) != null ? target : name);
+                    return processObjectForGet(ognlContext, target, null, null, context.get(Config.NEXT_CHAIN) != null ? target : name);
                 }
                 if (!this.isUnknownIsLiteral(context)) {
                     throw new NoSuchPropertyException(target, name);
@@ -77,8 +76,8 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
                     throw new OgnlException(sb.toString());
                 }
             }
-            value = processObject(ognlContext, target, (String) name, name, value);
-            setPropertyLoose(ognlContext, target, (String) name, value);
+            value = processObjectForGet(ognlContext, target, (String) name, name, value);
+            setPropertyLoose(ognlContext, target, name, value);
             return value;
         } catch (Exception e) {
             e.printStackTrace();
@@ -94,6 +93,13 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
                 && target.getClass().isAssignableFrom(ognlContext.getRoot().getClass())) {
             return;
         }
+        try {
+            value = processObjectForSet((OgnlContext) context, target, (String)name, name, value);
+        }
+        catch (PropertySetIgnoreException e) {
+            return;
+        }
+
         if (this.setPossibleProperty(context, target, (String) name, value) == OgnlRuntime.NotFound) {
             if (level == 1 && this.isFirstUnknownIgnored(context)
                     && target.getClass().isAssignableFrom(ognlContext.getRoot().getClass())) {
@@ -184,8 +190,25 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
         return ((ObjectConstructor) context.get(OBJECT_CONSTRUCTOR_KEY)).createObject(cls, componentType, (MapNode) context.get(Config.NEXT_CHAIN));
     }
 
-    Object processObject(OgnlContext context, Object target, String nameForBeanProperty, Object name, Object value) throws OgnlException {
+    Object processObjectForGet(OgnlContext context, Object target, String nameForBeanProperty,
+                               Object name, Object value) {
         OgnlPropertyDescriptor propertyDescriptorValue = null;
+        propertyDescriptorValue = getOgnlPropertyDescriptor(target, nameForBeanProperty, name, propertyDescriptorValue);
+        return ((ObjectConstructor) context.get(OBJECT_CONSTRUCTOR_KEY)).processObjectForGet(
+                context, target, propertyDescriptorValue, value,
+                (MapNode) context.get(Config.NEXT_CHAIN));
+    }
+
+    Object processObjectForSet(OgnlContext context, Object target, String nameForBeanProperty,
+                               Object name, Object value) {
+        OgnlPropertyDescriptor propertyDescriptorValue = null;
+        propertyDescriptorValue = getOgnlPropertyDescriptor(target, nameForBeanProperty, name, propertyDescriptorValue);
+        return ((ObjectConstructor) context.get(OBJECT_CONSTRUCTOR_KEY)).processObjectForSet(
+                context, target, propertyDescriptorValue, value,
+                (MapNode) context.get(Config.NEXT_CHAIN));
+    }
+
+    private OgnlPropertyDescriptor getOgnlPropertyDescriptor(Object target, String nameForBeanProperty, Object name, OgnlPropertyDescriptor propertyDescriptorValue) {
         if (nameForBeanProperty != null) {
             try {
                 propertyDescriptorValue = OgnlRuntime.getPropertyDescriptor(target.getClass(), nameForBeanProperty);
@@ -195,8 +218,7 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
         if (propertyDescriptorValue == null) {
             propertyDescriptorValue = new OgnlPropertyDescriptor(name);
         }
-        return ((ObjectConstructor) context.get(OBJECT_CONSTRUCTOR_KEY)).processObject(
-                context, target, propertyDescriptorValue, value, (MapNode) context.get(Config.NEXT_CHAIN));
+        return propertyDescriptorValue;
     }
 
     void keepArraySource(OgnlContext context, Object target, String propertyName, int level) {

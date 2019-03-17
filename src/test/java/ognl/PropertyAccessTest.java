@@ -87,6 +87,7 @@ public class PropertyAccessTest {
     public void testBindWithFirstLetter() throws OgnlException {
         OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
         context.extend();
+        context.setFirstUnknownIgnorance(true);
         MyTest3 root = new MyTest3();
         List<String> bindingList = new ArrayList<>();
         bindingList.add("myTest3.id=500");
@@ -202,14 +203,14 @@ public class PropertyAccessTest {
         assertEquals(Long.valueOf(4), root.getMyTest2().getMyTest2List().get(0).getObjects().get(1).getId());
         assertEquals(Long.valueOf(5), root.getMyTest2().getMyTest2List().get(1).getObjects().get(0).getId());
         assertEquals(Long.valueOf(6), root.getMyTest2().getMyTest2List().get(1).getObjects().get(1).getId());
-        assertEquals(Long.valueOf(0), root.getMyTest2().getObjects().get(0).getId());
+        assertEquals(null, root.getMyTest2().getObjects().get(0).getId());
         Iterator<InsideTest> it = root.getMyTest2().getSet().iterator();
         assertEquals("set0", it.next().getName());
         assertEquals("set1", it.next().getName());
         Iterator<String> itStr = root.getMyTest2().getStringSet().iterator();
         assertEquals("stringSet0", itStr.next());
         assertEquals("stringSet1", itStr.next());
-        assertEquals("obj0_name", root.getMyTest2().getObjects().get(0).getName());
+        assertEquals(null, root.getMyTest2().getObjects().get(0).getName());
     }
 
     @Ignore
