@@ -798,11 +798,13 @@ public abstract class Ognl {
         private Boolean isPartOfName;
         private String token;
         private NodeType nodeType;
+        private Boolean isEndToken;
 
-        Token(Boolean isPartOfName, String token, NodeType nodeType) {
+        Token(Boolean isPartOfName, String token, NodeType nodeType, Boolean isEndToken) {
             this.isPartOfName = isPartOfName;
             this.token = token;
             this.nodeType = nodeType;
+            this.isEndToken = isEndToken;
         }
 
         public Boolean getIsPartOfName() {
@@ -816,12 +818,16 @@ public abstract class Ognl {
         public NodeType getNodeType() {
             return nodeType;
         }
+
+        public Boolean getEndToken() {
+            return isEndToken;
+        }
     }
 
     static {
-        specialTokensMap.put(".", new Token(false, ".", NodeType.SINGLE));
-        specialTokensMap.put("[", new Token(true, "]", NodeType.COLLECTION));
-        specialTokensMap.put("=", new Token(false, "=", NodeType.SINGLE));
+        specialTokensMap.put(".", new Token(false, ".", NodeType.SINGLE, false));
+        specialTokensMap.put("[", new Token(true, "]", NodeType.COLLECTION, false));
+        specialTokensMap.put("=", new Token(false, "=", NodeType.SINGLE, true));
     }
 
     public static MapNode tokenize(List<String> expressions) {
@@ -831,10 +837,14 @@ public abstract class Ognl {
             MapNode currentNode = null;
             StringBuilder name = new StringBuilder();
             Token nextToken = null;
+            Boolean isEndDetected = false;
             for (char ch : expr.toCharArray()) {
                 Token token = specialTokensMap.get(Character.toString(ch));
                 NodeType nodeType = NodeType.UNKNOWN;
-                if (token == null) {
+                if(isEndDetected) {
+                    name.append(ch);
+                }
+                else if (token == null) {
                     name.append(ch);
                     if (nextToken != null && Character.toString(ch).equals(nextToken.getToken())) {
                         token = nextToken;
@@ -848,8 +858,9 @@ public abstract class Ognl {
                 if (name.length() == 0) {
                     continue;
                 }
-                if (token != null) {
+                if (!isEndDetected && token != null) {
                     Map<String, MapNode> childMap = null;
+                    isEndDetected = token.getEndToken();
                     if (currentNode == null) {
                         childMap = m.getChildren();
                     } else {

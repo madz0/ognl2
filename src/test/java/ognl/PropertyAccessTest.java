@@ -225,4 +225,16 @@ public class PropertyAccessTest {
         Ognl.getValue(bindingList, context, root);
         assertNull(root.getMyTest2().getObjects().get(0).getName());
     }
+
+    @Test
+    public void bindWithValueContainingDotTest() throws OgnlException {
+        OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
+        context.extend();
+        MyTest3 root = new MyTest3();
+        List<String> bindingList = new ArrayList<>();
+        bindingList.add("myTest2.objects[0].name=x.y.y");
+
+        Ognl.getValue(bindingList, context, root);
+        assertEquals("x.y.y", root.getMyTest2().getObjects().get(0).getName());
+    }
 }
