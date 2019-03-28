@@ -85,4 +85,9 @@ public class OgnlPropertyDescriptor {
     public Boolean isPropertyDescriptor() {
         return descriptor != null;
     }
+
+    @Override
+    public String toString() {
+        return getPropertyName();
+    }
 }
