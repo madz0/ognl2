@@ -841,10 +841,9 @@ public abstract class Ognl {
             for (char ch : expr.toCharArray()) {
                 Token token = specialTokensMap.get(Character.toString(ch));
                 NodeType nodeType = NodeType.UNKNOWN;
-                if(isEndDetected) {
+                if (isEndDetected) {
                     name.append(ch);
-                }
-                else if (token == null) {
+                } else if (token == null) {
                     name.append(ch);
                     if (nextToken != null && Character.toString(ch).equals(nextToken.getToken())) {
                         token = nextToken;
@@ -884,8 +883,11 @@ public abstract class Ognl {
                 }
             }
 
-            if (currentNode != null && name.length() > 0) {
-                currentNode.setValue(name.toString());
+            if (currentNode != null) {
+                currentNode.setContainsValue(true);
+                if (name.length() > 0) {
+                    currentNode.setValue(name.toString());
+                }
             }
         }
         return m;

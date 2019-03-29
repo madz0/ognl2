@@ -13,11 +13,13 @@ public class MapNode {
     private Boolean isRoot = false;
     private MapNode parent;
     private String path;
+    private Boolean containsValue;
 
     public MapNode(String name, Ognl.NodeType nodeType, MapNode parent) {
         this.name = name;
         this.nodeType = nodeType;
         this.parent = parent;
+        containsValue = false;
     }
 
     public MapNode getMapping(String name) {
@@ -68,5 +70,13 @@ public class MapNode {
 
     public void setIsRoot(Boolean root) {
         isRoot = root;
+    }
+
+    public Boolean getContainsValue() {
+        return containsValue;
+    }
+
+    public void setContainsValue(Boolean containsValue) {
+        this.containsValue = containsValue;
     }
 }
