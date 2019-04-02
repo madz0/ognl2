@@ -270,4 +270,16 @@ public class PropertyAccessTest {
         Ognl.getValue(bindingList, context, root);
         assertEquals("salam", root.getMap3().get("KEY1").getObjects().get(0).getName());
     }
+
+    @Ignore
+    @Test
+    public void mapStringKeyBindWithoutQuotation() throws OgnlException {
+        OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
+        context.extend();
+        MapKeyTest root = new MapKeyTest();
+        List<String> bindingList = new ArrayList<>();
+        bindingList.add("map3[KEY1].objects[0].name=salam");
+        Ognl.getValue(bindingList, context, root);
+        assertEquals("salam", root.getMap3().get("KEY1").getObjects().get(0).getName());
+    }
 }
