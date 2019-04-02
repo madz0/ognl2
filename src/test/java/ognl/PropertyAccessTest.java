@@ -237,4 +237,37 @@ public class PropertyAccessTest {
         Ognl.getValue(bindingList, context, root);
         assertEquals("x.y.y", root.getMyTest2().getObjects().get(0).getName());
     }
+
+    @Test
+    public void testMapEnumKeyBind() throws OgnlException {
+        OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
+        context.extend();
+        MapKeyTest root = new MapKeyTest();
+        List<String> bindingList = new ArrayList<>();
+        bindingList.add("map['KEY1']=salam");
+        Ognl.getValue(bindingList, context, root);
+        assertEquals("salam", root.getMap().get(MapKeyTest.KeyEnum.KEY1));
+    }
+
+    @Test
+    public void mapEnumKeyBindComplexTest() throws OgnlException {
+        OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
+        context.extend();
+        MapKeyTest root = new MapKeyTest();
+        List<String> bindingList = new ArrayList<>();
+        bindingList.add("map2['KEY1'].objects[0].name=salam");
+        Ognl.getValue(bindingList, context, root);
+        assertEquals("salam", root.getMap2().get(MapKeyTest.KeyEnum.KEY1).getObjects().get(0).getName());
+    }
+
+    @Test
+    public void mapStringKeyBindComplexTest() throws OgnlException {
+        OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
+        context.extend();
+        MapKeyTest root = new MapKeyTest();
+        List<String> bindingList = new ArrayList<>();
+        bindingList.add("map3['KEY1'].objects[0].name=salam");
+        Ognl.getValue(bindingList, context, root);
+        assertEquals("salam", root.getMap3().get("KEY1").getObjects().get(0).getName());
+    }
 }

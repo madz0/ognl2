@@ -83,9 +83,6 @@ public class ExListPropertyAccessor
             if (list.size() > index) {
                 value = list.get(index);
                 Object clsObj = null;
-                if (isnullInited) {
-                    clsObj = this.getParameterizedType(ognlContext, level, 0);
-                }
                 if (value != null && value.getClass().isArray()) {
                     this.keepArraySource(ognlContext, target, index, level);
                 }
@@ -93,6 +90,9 @@ public class ExListPropertyAccessor
                     value = processObjectForGet(ognlContext, target, null, name, value);
                     list.set(index, value);
                     return value;
+                }
+                if (isnullInited) {
+                    clsObj = this.getParameterizedType(ognlContext, level, 0);
                 }
                 if (clsObj == null) {
                     if (this.isUnknownInited(context)) {
