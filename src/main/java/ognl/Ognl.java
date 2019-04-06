@@ -769,7 +769,7 @@ public abstract class Ognl {
         return root;
     }
 
-    public static <T> T getValue(List<String> expressions, Map context, Class<T> rootClass)
+    public static <T> T getValue(List<Map.Entry<String, Object>> expressions, Map context, Class<T> rootClass)
             throws OgnlException {
         if (expressions != null) {
             MapNode mapNode = tokenize(expressions);
@@ -778,12 +778,13 @@ public abstract class Ognl {
                 getValue(mapNode, context, root);
                 return (T) root;
             } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
             }
         }
         return null;
     }
 
-    public static Object getValue(List<String> expressions, Map context, Object root)
+    public static Object getValue(List<Map.Entry<String, Object>> expressions, Map context, Object root)
             throws OgnlException {
         if (expressions != null) {
             MapNode mapNode = tokenize(expressions);
@@ -810,17 +811,19 @@ public abstract class Ognl {
         public Boolean getIsPartOfName() {
             return isPartOfName;
         }
-
         public String getToken() {
             return token;
         }
-
         public NodeType getNodeType() {
             return nodeType;
         }
-
         public Boolean getEndToken() {
             return isEndToken;
+        }
+
+        @Override
+        public String toString() {
+            return token;
         }
     }
 
@@ -828,17 +831,21 @@ public abstract class Ognl {
         specialTokensMap.put(".", new Token(false, ".", NodeType.SINGLE, false));
         specialTokensMap.put("[", new Token(true, "]", NodeType.COLLECTION, false));
         specialTokensMap.put("=", new Token(false, "=", NodeType.SINGLE, true));
+        specialTokensMap.put("", new Token(false, "", NodeType.SINGLE, true));
     }
 
-    public static MapNode tokenize(List<String> expressions) {
+    public static MapNode tokenize(List<Map.Entry<String, Object>> expressions) {
         MapNode m = new MapNode("_root_", NodeType.SINGLE, null);
         m.setIsRoot(true);
-        for (String expr : expressions) {
+        for (Map.Entry<String, Object> expr : expressions) {
             MapNode currentNode = null;
             StringBuilder name = new StringBuilder();
             Token nextToken = null;
             Boolean isEndDetected = false;
-            for (char ch : expr.toCharArray()) {
+            char[] tokens = expr.getKey().toCharArray();
+            int totalLen = tokens.length;
+            for (char ch : tokens) {
+                totalLen --;
                 Token token = specialTokensMap.get(Character.toString(ch));
                 NodeType nodeType = NodeType.UNKNOWN;
                 if (isEndDetected) {
@@ -847,6 +854,9 @@ public abstract class Ognl {
                     name.append(ch);
                     if (nextToken != null && Character.toString(ch).equals(nextToken.getToken())) {
                         token = nextToken;
+                    }
+                    else if(totalLen == 0) {
+                        token = specialTokensMap.get("");
                     }
                 } else {
                     nodeType = token.getNodeType();
@@ -885,9 +895,7 @@ public abstract class Ognl {
 
             if (currentNode != null) {
                 currentNode.setContainsValue(true);
-                if (name.length() > 0) {
-                    currentNode.setValue(name.toString());
-                }
+                currentNode.setValue(expr.getValue());
             }
         }
         return m;

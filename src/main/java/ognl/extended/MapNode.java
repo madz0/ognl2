@@ -8,7 +8,7 @@ import java.util.Map;
 public class MapNode {
     private Map<String, MapNode> children = new HashMap<>();
     private String name;
-    private String value;
+    private Object value;
     private Ognl.NodeType nodeType;
     private Boolean isRoot = false;
     private MapNode parent;
@@ -40,11 +40,11 @@ public class MapNode {
         return name;
     }
 
-    public String getValue() {
+    public Object getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(Object value) {
         this.value = value;
     }
 

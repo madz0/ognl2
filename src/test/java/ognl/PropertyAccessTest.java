@@ -4,9 +4,7 @@ import ognl.model.*;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -38,32 +36,32 @@ public class PropertyAccessTest {
         OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
         context.extend();
         MyTest3 root = new MyTest3();
-        List<String> bindingList = new ArrayList<>();
-        bindingList.add("myTest2.objects[0].name=obj0_name");
-        bindingList.add("myTest2.objects[0].name=obj0_name");
-        bindingList.add("myTest2.objects[0].id=0");
-        bindingList.add("myTest2.objects[1].id=1");
-        bindingList.add("myTest2.objects[1].name=obj1_name");
-        bindingList.add("insideTest.id=2");
-        bindingList.add("insideTest.name=inside_2");
+        List<Map.Entry<String, Object>> bindingList = new ArrayList<>();
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.objects[0].name", "obj0_name"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.objects[0].name", "obj0_name"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.objects[0].id", "0"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.objects[1].id", "1"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.objects[1].name", "obj1_name"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("insideTest.id", "2"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("insideTest.name", "inside_2"));
 
-        bindingList.add("myTest2.id=9");
-        bindingList.add("myTest2.myTest2List[0].id=7");
-        bindingList.add("myTest2.myTest2List[0].objects[0].name=obj3_name");
-        bindingList.add("myTest2.myTest2List[0].objects[0].id=3");
-        bindingList.add("myTest2.myTest2List[0].objects[1].id=4");
-        bindingList.add("myTest2.myTest2List[0].objects[1].name=obj4_name");
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.id", "9"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[0].id", "7"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[0].objects[0].name", "obj3_name"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[0].objects[0].id", "3"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[0].objects[1].id", "4"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[0].objects[1].name", "obj4_name"));
 
-        bindingList.add("myTest2.myTest2List[1].id=8");
-        bindingList.add("myTest2.myTest2List[1].objects[0].name=obj5_name");
-        bindingList.add("myTest2.myTest2List[1].objects[0].id=5");
-        bindingList.add("myTest2.myTest2List[1].objects[1].id=6");
-        bindingList.add("myTest2.myTest2List[1].objects[1].name=obj6_name");
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[1].id", "8"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[1].objects[0].name", "obj5_name"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[1].objects[0].id", "5"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[1].objects[1].id", "6"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[1].objects[1].name", "obj6_name"));
 
-        bindingList.add("myTest2.set[0].name=set0");
-        bindingList.add("myTest2.set[1].name=set1");
-        bindingList.add("myTest2.stringSet[0]=stringSet0");
-        bindingList.add("myTest2.stringSet[1]=stringSet1");
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.set[0].name", "set0"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.set[1].name", "set1"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.stringSet[0]", "stringSet0"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.stringSet[1]", "stringSet1"));
 
         Ognl.getValue(bindingList, context, root);
         assertEquals(Long.valueOf(9), root.getMyTest2().getId());
@@ -89,28 +87,28 @@ public class PropertyAccessTest {
         context.extend();
         context.setFirstUnknownIgnorance(true);
         MyTest3 root = new MyTest3();
-        List<String> bindingList = new ArrayList<>();
-        bindingList.add("myTest3.id=500");
-        bindingList.add("myTest3.myTest2.objects[0].name=obj0_name");
-        bindingList.add("myTest3.myTest2.objects[0].name=obj0_name");
-        bindingList.add("myTest3.myTest2.objects[0].id=0");
-        bindingList.add("myTest3.myTest2.objects[1].id=1");
-        bindingList.add("myTest3.myTest2.objects[1].name=obj1_name");
-        bindingList.add("myTest3.insideTest.id=2");
-        bindingList.add("myTest3.insideTest.name=inside_2");
+        List<Map.Entry<String, Object>> bindingList = new ArrayList<>();
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.id", "500"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.objects[0].name", "obj0_name"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.objects[0].name", "obj0_name"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.objects[0].id", "0"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.objects[1].id", "1"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.objects[1].name", "obj1_name"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.insideTest.id", "2"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.insideTest.name", "inside_2"));
 
-        bindingList.add("myTest3.myTest2.id=9");
-        bindingList.add("myTest3.myTest2.myTest2List[0].id=7");
-        bindingList.add("myTest3.myTest2.myTest2List[0].objects[0].name=obj3_name");
-        bindingList.add("myTest3.myTest2.myTest2List[0].objects[0].id=3");
-        bindingList.add("myTest3.myTest2.myTest2List[0].objects[1].id=4");
-        bindingList.add("myTest3.myTest2.myTest2List[0].objects[1].name=obj4_name");
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.id", "9"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.myTest2List[0].id", "7"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.myTest2List[0].objects[0].name", "obj3_name"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.myTest2List[0].objects[0].id", "3"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.myTest2List[0].objects[1].id", "4"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.myTest2List[0].objects[1].name", "obj4_name"));
 
-        bindingList.add("myTest3.myTest2.myTest2List[1].id=8");
-        bindingList.add("myTest3.myTest2.myTest2List[1].objects[0].name=obj5_name");
-        bindingList.add("myTest3.myTest2.myTest2List[1].objects[0].id=5");
-        bindingList.add("myTest3.myTest2.myTest2List[1].objects[1].id=6");
-        bindingList.add("myTest3.myTest2.myTest2List[1].objects[1].name=obj6_name");
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.myTest2List[1].id", "8"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.myTest2List[1].objects[0].name", "obj5_name"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.myTest2List[1].objects[0].id", "5"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.myTest2List[1].objects[1].id", "6"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.myTest2List[1].objects[1].name", "obj6_name"));
 
         Ognl.getValue(bindingList, context, root);
         assertEquals(Long.valueOf(9), root.getMyTest2().getId());
@@ -128,28 +126,28 @@ public class PropertyAccessTest {
         OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
         context.extend();
         context.setFirstUnknownIgnorance(true);
-        List<String> bindingList = new ArrayList<>();
-        bindingList.add("myTest3.id=500");
-        bindingList.add("myTest3.myTest2.objects[0].name=obj0_name");
-        bindingList.add("myTest3.myTest2.objects[0].name=obj0_name");
-        bindingList.add("myTest3.myTest2.objects[0].id=0");
-        bindingList.add("myTest3.myTest2.objects[1].id=1");
-        bindingList.add("myTest3.myTest2.objects[1].name=obj1_name");
-        bindingList.add("myTest3.insideTest.id=2");
-        bindingList.add("myTest3.insideTest.name=inside_2");
+        List<Map.Entry<String, Object>> bindingList = new ArrayList<>();
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.id", "500"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.objects[0].name", "obj0_name"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.objects[0].name", "obj0_name"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.objects[0].id", "0"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.objects[1].id", "1"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.objects[1].name", "obj1_name"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.insideTest.id", "2"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.insideTest.name", "inside_2"));
 
-        bindingList.add("myTest3.myTest2.id=9");
-        bindingList.add("myTest3.myTest2.myTest2List[0].id=7");
-        bindingList.add("myTest3.myTest2.myTest2List[0].objects[0].name=obj3_name");
-        bindingList.add("myTest3.myTest2.myTest2List[0].objects[0].id=3");
-        bindingList.add("myTest3.myTest2.myTest2List[0].objects[1].id=4");
-        bindingList.add("myTest3.myTest2.myTest2List[0].objects[1].name=obj4_name");
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.id", "9"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.myTest2List[0].id", "7"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.myTest2List[0].objects[0].name", "obj3_name"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.myTest2List[0].objects[0].id", "3"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.myTest2List[0].objects[1].id", "4"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.myTest2List[0].objects[1].name", "obj4_name"));
 
-        bindingList.add("myTest3.myTest2.myTest2List[1].id=8");
-        bindingList.add("myTest3.myTest2.myTest2List[1].objects[0].name=obj5_name");
-        bindingList.add("myTest3.myTest2.myTest2List[1].objects[0].id=5");
-        bindingList.add("myTest3.myTest2.myTest2List[1].objects[1].id=6");
-        bindingList.add("myTest3.myTest2.myTest2List[1].objects[1].name=obj6_name");
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.myTest2List[1].id", "8"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.myTest2List[1].objects[0].name", "obj5_name"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.myTest2List[1].objects[0].id", "5"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.myTest2List[1].objects[1].id", "6"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest3.myTest2.myTest2List[1].objects[1].name", "obj6_name"));
 
         MyTest3 root = Ognl.getValue(bindingList, context, MyTest3.class);
         assertEquals(Long.valueOf(9), root.getMyTest2().getId());
@@ -167,33 +165,33 @@ public class PropertyAccessTest {
         OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
         context.extend();
         MyTest3 root = new MyTest3();
-        List<String> bindingList = new ArrayList<>();
-        bindingList.add("myTest2.objects[0]._name=wrong_name");
-        bindingList.add("myTest2.objects[0].name=obj0_name");
-        bindingList.add("myTest2.objects[0].name=obj0_name");
-        bindingList.add("myTest2.objects[0].id=0");
-        bindingList.add("myTest2.objects[1].id=1");
-        bindingList.add("myTest2.objects[1].name=obj1_name");
-        bindingList.add("insideTest.id=2");
-        bindingList.add("insideTest.name=inside_2");
+        List<Map.Entry<String, Object>> bindingList = new ArrayList<>();
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.objects[0]._name", "wrong_name"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.objects[0].name", "obj0_name"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.objects[0].name", "obj0_name"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.objects[0].id", "0"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.objects[1].id", "1"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.objects[1].name", "obj1_name"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("insideTest.id", "2"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("insideTest.name", "inside_2"));
 
-        bindingList.add("myTest2.id=9");
-        bindingList.add("myTest2.myTest2List[0].id=7");
-        bindingList.add("myTest2.myTest2List[0].objects[0].name=obj3_name");
-        bindingList.add("myTest2.myTest2List[0].objects[0].id=3");
-        bindingList.add("myTest2.myTest2List[0].objects[1].id=4");
-        bindingList.add("myTest2.myTest2List[0].objects[1].name=obj4_name");
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.id", "9"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[0].id", "7"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[0].objects[0].name", "obj3_name"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[0].objects[0].id", "3"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[0].objects[1].id", "4"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[0].objects[1].name", "obj4_name"));
 
-        bindingList.add("myTest2.myTest2List[1].id=8");
-        bindingList.add("myTest2.myTest2List[1].objects[0].name=obj5_name");
-        bindingList.add("myTest2.myTest2List[1].objects[0].id=5");
-        bindingList.add("myTest2.myTest2List[1].objects[1].id=6");
-        bindingList.add("myTest2.myTest2List[1].objects[1].name=obj6_name");
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[1].id", "8"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[1].objects[0].name", "obj5_name"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[1].objects[0].id", "5"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[1].objects[1].id", "6"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[1].objects[1].name", "obj6_name"));
 
-        bindingList.add("myTest2.set[0].name=set0");
-        bindingList.add("myTest2.set[1].name=set1");
-        bindingList.add("myTest2.stringSet[0]=stringSet0");
-        bindingList.add("myTest2.stringSet[1]=stringSet1");
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.set[0].name", "set0"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.set[1].name", "set1"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.stringSet[0]", "stringSet0"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.stringSet[1]", "stringSet1"));
 
         Ognl.getValue(bindingList, context, root);
         assertEquals(Long.valueOf(9), root.getMyTest2().getId());
@@ -219,8 +217,8 @@ public class PropertyAccessTest {
         OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
         context.extend();
         MyTest3 root = new MyTest3();
-        List<String> bindingList = new ArrayList<>();
-        bindingList.add("myTest2.objects[0].name=null");
+        List<Map.Entry<String, Object>> bindingList = new ArrayList<>();
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.objects[0].name", "null"));
 
         Ognl.getValue(bindingList, context, root);
         assertNull(root.getMyTest2().getObjects().get(0).getName());
@@ -231,8 +229,8 @@ public class PropertyAccessTest {
         OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
         context.extend();
         MyTest3 root = new MyTest3();
-        List<String> bindingList = new ArrayList<>();
-        bindingList.add("myTest2.objects[0].name=x.y.y");
+        List<Map.Entry<String, Object>> bindingList = new ArrayList<>();
+        bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.objects[0].name", "x.y.y"));
 
         Ognl.getValue(bindingList, context, root);
         assertEquals("x.y.y", root.getMyTest2().getObjects().get(0).getName());
@@ -243,8 +241,8 @@ public class PropertyAccessTest {
         OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
         context.extend();
         MapKeyTest root = new MapKeyTest();
-        List<String> bindingList = new ArrayList<>();
-        bindingList.add("map['KEY1']=salam");
+        List<Map.Entry<String, Object>> bindingList = new ArrayList<>();
+        bindingList.add(new AbstractMap.SimpleEntry<>("map['KEY1']", "salam"));
         Ognl.getValue(bindingList, context, root);
         assertEquals("salam", root.getMap().get(MapKeyTest.KeyEnum.KEY1));
     }
@@ -254,8 +252,8 @@ public class PropertyAccessTest {
         OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
         context.extend();
         MapKeyTest root = new MapKeyTest();
-        List<String> bindingList = new ArrayList<>();
-        bindingList.add("map2['KEY1'].objects[0].name=salam");
+        List<Map.Entry<String, Object>> bindingList = new ArrayList<>();
+        bindingList.add(new AbstractMap.SimpleEntry<>("map2['KEY1'].objects[0].name", "salam"));
         Ognl.getValue(bindingList, context, root);
         assertEquals("salam", root.getMap2().get(MapKeyTest.KeyEnum.KEY1).getObjects().get(0).getName());
     }
@@ -265,8 +263,8 @@ public class PropertyAccessTest {
         OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
         context.extend();
         MapKeyTest root = new MapKeyTest();
-        List<String> bindingList = new ArrayList<>();
-        bindingList.add("map3['KEY1'].objects[0].name=salam");
+        List<Map.Entry<String, Object>> bindingList = new ArrayList<>();
+        bindingList.add(new AbstractMap.SimpleEntry<>("map3['KEY1'].objects[0].name", "salam"));
         Ognl.getValue(bindingList, context, root);
         assertEquals("salam", root.getMap3().get("KEY1").getObjects().get(0).getName());
     }
@@ -277,9 +275,22 @@ public class PropertyAccessTest {
         OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
         context.extend();
         MapKeyTest root = new MapKeyTest();
-        List<String> bindingList = new ArrayList<>();
-        bindingList.add("map3[KEY1].objects[0].name=salam");
+        List<Map.Entry<String, Object>> bindingList = new ArrayList<>();
+        bindingList.add(new AbstractMap.SimpleEntry<>("map3[KEY1].objects[0].name", "salam"));
         Ognl.getValue(bindingList, context, root);
         assertEquals("salam", root.getMap3().get("KEY1").getObjects().get(0).getName());
     }
+
+    @Test
+    public void bindObjectToPropertyTest() throws OgnlException {
+        OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
+        context.extend();
+        MyTest root = new MyTest();
+        List<Object> objects = Arrays.asList("ok");
+        List<Map.Entry<String, Object>> bindingList = new ArrayList<>();
+        bindingList.add(new AbstractMap.SimpleEntry<>("objects", objects));
+        Ognl.getValue(bindingList, context, root);
+        assertEquals("ok", root.getObjects().get(0));
+    }
+
 }
