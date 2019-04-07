@@ -3,21 +3,24 @@
  */
 package ognl.extended;
 
-import static ognl.extended.Config.*;
+import ognl.*;
+import ognl.internal.extended.ArraySourceContainer;
 
 import java.beans.IntrospectionException;
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ognl.*;
-import ognl.internal.extended.ArraySourceContainer;
+import static ognl.extended.Config.ARRAR_SOURCE_PREFIX_KEY;
+import static ognl.extended.Config.EXPANDED_ARRAY_KEY;
 
 public class ExArrayPropertyAccessor
         extends ExObjectPropertyAccessor
         implements PropertyAccessor {
     private PropertyAccessor arrayPropertyAccessor = new ArrayPropertyAccessor();
+
     @Override
     public Object getProperty(Map context, Object target, Object name) throws OgnlException {
         OgnlContext ognlContext = (OgnlContext) context;
@@ -93,7 +96,7 @@ public class ExArrayPropertyAccessor
                             value = this.createProperObject(ognlContext, cls, cls.getComponentType());
                             Array.set(target, i, value);
                             return value;
-                        } catch (IllegalAccessException | InstantiationException e) {
+                        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
                             e.printStackTrace();
                             return null;
                         }
@@ -174,7 +177,7 @@ public class ExArrayPropertyAccessor
     }
 
     public String getSourceAccessor(OgnlContext context, Object target, Object index) {
-       return arrayPropertyAccessor.getSourceAccessor(context, target, index);
+        return arrayPropertyAccessor.getSourceAccessor(context, target, index);
     }
 
     public String getSourceSetter(OgnlContext context, Object target, Object index) {

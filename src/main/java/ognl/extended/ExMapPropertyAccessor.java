@@ -5,6 +5,7 @@ package ognl.extended;
 
 import ognl.*;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -98,7 +99,7 @@ public class ExMapPropertyAccessor
                     if (cls.isArray()) {
                         this.keepArraySource(ognlContext, map, (String) name, level);
                     }
-                } catch (IllegalAccessException | InstantiationException e) {
+                } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
                     e.printStackTrace();
                     return null;
                 }

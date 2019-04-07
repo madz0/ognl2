@@ -14,12 +14,14 @@ public class MapNode {
     private MapNode parent;
     private String path;
     private Boolean containsValue;
+    private Boolean containsEmptyChildValue;
 
-    public MapNode(String name, Ognl.NodeType nodeType, MapNode parent) {
+    public MapNode(String name, Ognl.NodeType nodeType, MapNode parent, Boolean containsEmptyChildValue) {
         this.name = name;
         this.nodeType = nodeType;
         this.parent = parent;
         containsValue = false;
+        this.containsEmptyChildValue = containsEmptyChildValue;
     }
 
     public MapNode getMapping(String name) {
@@ -78,5 +80,9 @@ public class MapNode {
 
     public void setContainsValue(Boolean containsValue) {
         this.containsValue = containsValue;
+    }
+
+    public Boolean getContainsEmptyChildValue() {
+        return containsEmptyChildValue;
     }
 }

@@ -31,6 +31,7 @@
 package ognl;
 
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 import ognl.enhance.ExpressionAccessor;
@@ -777,7 +778,7 @@ public abstract class Ognl {
                 Object root = OgnlRuntime.createProperObject((OgnlContext) context, rootClass, rootClass.getComponentType(), mapNode);
                 getValue(mapNode, context, root);
                 return (T) root;
-            } catch (InstantiationException | IllegalAccessException e) {
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
         }
@@ -811,12 +812,15 @@ public abstract class Ognl {
         public Boolean getIsPartOfName() {
             return isPartOfName;
         }
+
         public String getToken() {
             return token;
         }
+
         public NodeType getNodeType() {
             return nodeType;
         }
+
         public Boolean getEndToken() {
             return isEndToken;
         }
@@ -835,7 +839,7 @@ public abstract class Ognl {
     }
 
     public static MapNode tokenize(List<Map.Entry<String, Object>> expressions) {
-        MapNode m = new MapNode("_root_", NodeType.SINGLE, null);
+        MapNode m = new MapNode("_root_", NodeType.SINGLE, null, false);
         m.setIsRoot(true);
         for (Map.Entry<String, Object> expr : expressions) {
             MapNode currentNode = null;
@@ -844,8 +848,9 @@ public abstract class Ognl {
             Boolean isEndDetected = false;
             char[] tokens = expr.getKey().toCharArray();
             int totalLen = tokens.length;
+            TOKENS:
             for (char ch : tokens) {
-                totalLen --;
+                totalLen--;
                 Token token = specialTokensMap.get(Character.toString(ch));
                 NodeType nodeType = NodeType.UNKNOWN;
                 if (isEndDetected) {
@@ -854,8 +859,7 @@ public abstract class Ognl {
                     name.append(ch);
                     if (nextToken != null && Character.toString(ch).equals(nextToken.getToken())) {
                         token = nextToken;
-                    }
-                    else if(totalLen == 0) {
+                    } else if (totalLen == 0) {
                         token = specialTokensMap.get("");
                     }
                 } else {
@@ -878,7 +882,12 @@ public abstract class Ognl {
                     MapNode currentHolder = currentNode;
                     currentNode = childMap.get(name.toString());
                     if (currentNode == null) {
-                        currentNode = new MapNode(name.toString(), nodeType, currentHolder);
+                        if (nodeType == NodeType.UNKNOWN) {
+                            if (token.isEndToken && expr.getValue() instanceof Collections) {
+                                nodeType = NodeType.COLLECTION;
+                            }
+                        }
+                        currentNode = new MapNode(name.toString(), nodeType, currentHolder, expr.getValue() == null || expr.getValue().equals(""));
                         childMap.put(name.toString(), currentNode);
                     }
                     name = new StringBuilder();

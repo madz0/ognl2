@@ -5,6 +5,7 @@ package ognl.extended;
 
 import ognl.*;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class ExListPropertyAccessor
@@ -111,7 +112,7 @@ public class ExListPropertyAccessor
                     }
                     list.set(index, value);
                     return value;
-                } catch (IllegalAccessException | InstantiationException e) {
+                } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
                     e.printStackTrace();
                     return processObjectForGet(ognlContext, target, null, name, null);
                 }
@@ -143,7 +144,7 @@ public class ExListPropertyAccessor
                 }
                 list.set(index, value);
                 return value;
-            } catch (IllegalAccessException | InstantiationException e) {
+            } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
                 e.printStackTrace();
                 return processObjectForGet(ognlContext, target, null, name, null);
             }
@@ -162,7 +163,7 @@ public class ExListPropertyAccessor
         boolean isExpanded = this.isExpanded(context);
         if (name instanceof Number) {
             Object clsObj = this.getParameterizedType((OgnlContext) context, level, 0);
-            if(clsObj!=null) {
+            if (clsObj != null) {
                 value = OgnlOps.convertValue(value, (Class) clsObj);
             }
             int index = ((Number) name).intValue();

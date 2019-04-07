@@ -2542,7 +2542,7 @@ public class OgnlRuntime {
     }
 
     public static Object createProperObject(OgnlContext context, Class<?> cls, Class<?> componentType, MapNode node)
-            throws InstantiationException, IllegalAccessException {
+            throws InstantiationException, IllegalAccessException, InvocationTargetException {
         if (context != null) {
             return ((ObjectConstructor) context.get(Config.OBJECT_CONSTRUCTOR_KEY)).createObject(cls, componentType, node);
         } else {
@@ -2552,7 +2552,13 @@ public class OgnlRuntime {
     }
 
     public static Object createProperObject(Class<?> cls, Class<?> componentType)
-            throws InstantiationException, IllegalAccessException {
+            throws InstantiationException, IllegalAccessException, InvocationTargetException {
         return createProperObject(null, cls, componentType, null);
+    }
+
+    public static <T> Constructor<T> getDefaultConstructor(Class<T> targetClass) throws InvocationTargetException {
+        List<Constructor<T>> constructors = cache.getConstructors(targetClass);
+        return constructors.stream().filter(x -> x.getParameterCount() == 0).findAny().orElseThrow(()
+                -> new InvocationTargetException(new IllegalArgumentException("No default constructor found")));
     }
 }

@@ -293,4 +293,16 @@ public class PropertyAccessTest {
         assertEquals("ok", root.getObjects().get(0));
     }
 
+    @Test
+    public void bindSetEmptyToArrayElementTest() throws OgnlException {
+        OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
+        context.extend();
+        MyTest root = new MyTest();
+        root.setObjects(Arrays.asList("salam", "bye"));
+        List<Map.Entry<String, Object>> bindingList = new ArrayList<>();
+        bindingList.add(new AbstractMap.SimpleEntry<>("objects[0]", ""));
+        Ognl.getValue(bindingList, context, root);
+        assertEquals("", root.getObjects().get(0));
+    }
+
 }

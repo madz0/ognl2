@@ -6,6 +6,7 @@ import ognl.OgnlException;
 import ognl.OgnlRuntime;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,7 +16,7 @@ public class DefaultObjectConstructor implements ObjectConstructor {
 
     @Override
     public Object createObject(Class<?> cls, Class<?> componentType, MapNode node)
-            throws InstantiationException, IllegalAccessException {
+            throws InstantiationException, IllegalAccessException, InvocationTargetException {
         if (List.class.isAssignableFrom(cls)) {
             if (LinkedList.class.isAssignableFrom(cls)) {
                 return new LinkedList();
@@ -52,7 +53,7 @@ public class DefaultObjectConstructor implements ObjectConstructor {
         if (OgnlRuntime.isPrimitiveOrWrapper(cls)) {
             return OgnlRuntime.getPrimitivesDefult(cls);
         }
-        return cls.newInstance();
+        return OgnlRuntime.getDefaultConstructor(cls).newInstance();
     }
 
     @Override

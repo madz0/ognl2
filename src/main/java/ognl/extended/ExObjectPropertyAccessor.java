@@ -3,11 +3,7 @@
  */
 package ognl.extended;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.Map;
 
 import static ognl.extended.Config.*;
@@ -186,7 +182,7 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
     }
 
     Object createProperObject(OgnlContext context, Class<?> cls, Class<?> componentType)
-            throws InstantiationException, IllegalAccessException {
+            throws InstantiationException, IllegalAccessException, InvocationTargetException {
         return ((ObjectConstructor) context.get(OBJECT_CONSTRUCTOR_KEY)).createObject(cls, componentType, (MapNode) context.get(Config.NEXT_CHAIN));
     }
 
