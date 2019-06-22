@@ -7,16 +7,16 @@
         <version>9</version>
     </parent>
 
-    <groupId>ognl</groupId>
-    <artifactId>ognl</artifactId>
+    <groupId>com.github.madz0</groupId>
+    <artifactId>ognl2</artifactId>
     <packaging>jar</packaging>
-    <version>3.2.11-SNAPSHOT-2.2-ext-SNAPSHOT</version>
-    <name>OGNL - Object Graph Navigation and Binding Library</name>
-    <description>OGNL - Object Graph Navigation Library</description>
+    <version>2.2-SNAPSHOT</version>
+    <name>OGNL2 - Object Graph Navigation and Binding Library </name>
+    <description>OGNL2 - Extended version of famous OGNL library derived from version 3.2.11-SNAPSHOT</description>
 
     <inceptionYear>1997</inceptionYear>
 
-    <url>http://ognl.org</url>
+    <url>http://github.com/madz0/ognl2</url>
 
     <licenses>
         <license>
@@ -27,27 +27,17 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git@github.com:jkuhnert/ognl.git</connection>
-        <url>git@github.com:jkuhnert/ognl.git</url>
-        <developerConnection>scm:git:git@github.com:jkuhnert/ognl.git</developerConnection>
+        <connection>scm:git:git@github.com:madz0/ognl2.git</connection>
+        <url>git@github.com:madz0/ognl2.git</url>
+        <developerConnection>scm:git:git@github.com:madz0/ognl2.git</developerConnection>
     </scm>
-
-    <organization>
-        <name>OpenSymphony</name>
-        <url>http://www.opensymphony.com</url>
-    </organization>
-
-    <issueManagement>
-        <system>jira</system>
-        <url>http://jira.opensymphony.com/browse/OGNL</url>
-    </issueManagement>
 
     <developers>
         <developer>
-            <id>lukaszlenart</id>
-            <email>lukaszlenart@apache.org</email>
+            <id>madz0</id>
+            <email>mohammad.basu@gmail.com</email>
             <roles>
-                <role>ASF Committer</role>
+                <role>Committer</role>
             </roles>
         </developer>
     </developers>
