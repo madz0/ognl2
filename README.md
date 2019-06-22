@@ -1,43 +1,71 @@
-# Object-Graph Navigation Language - OGNL
+# Object-Graph Navigation Language - OGNL2
 
-[![Build Status](https://travis-ci.org/jkuhnert/ognl.svg?branch=master)](https://travis-ci.org/jkuhnert/ognl)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/ognl/ognl/badge.svg)](https://maven-badges.herokuapp.com/maven-central/ognl/ognl/)
-[![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
+## If you don't know what is OGNL, then go check out [https://github.com/jkuhnert/ognl](https://github.com/jkuhnert/ognl)
 
-It's a simple Expression Language (EL) for Java, the code base sometime ago was migrated to the [Apache commons ognl](http://commons.apache.org/ognl/)
-and this source code is used just to maintenance 3.x branch. The new version from Apache will start from 4.x
+I created OGNL2, because I needed to make some changes to the original library!
 
-## New! Apache commons ognl project
+Changes are notably as following:
 
-Out of incubator and now officially found here [http://commons.apache.org/ognl/](http://commons.apache.org/ognl/)
+- Added support to navigate and apply a list of expressions an apply callbacks:
 
-## Description
+```java
+OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
+context.extend();
+MyTest3 root = new MyTest3();
+List<Map.Entry<String, Object>> bindingList = new ArrayList<>();
+bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.objects[0].name", "obj0_name"));
+bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.objects[0].id", "0"));
+bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.objects[1].id", "1"));
+bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.objects[1].name", "obj1_name"));
+bindingList.add(new AbstractMap.SimpleEntry<>("insideTest.id", "2"));
+bindingList.add(new AbstractMap.SimpleEntry<>("insideTest.name", "inside_2"));
 
-OGNL stands for Object-Graph Navigation Language; it is an expression language for getting and setting 
-properties of Java objects. You use the same expression for both getting and setting the value of a property.
+bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.id", "9"));
+bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[0].id", "7"));
+bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[0].objects[0].name", "obj3_name"));
+bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[0].objects[0].id", "3"));
+bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[0].objects[1].id", "4"));
+bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[0].objects[1].name", "obj4_name"));
 
-The `ognl.Ognl` class contains convenience methods for evaluating OGNL expressions. You can do this in two stages, parsing 
-an expression into an internal form and then using that internal form to either set or get the value of a property;
-or you can do it in a single stage, and get or set a property using the String form of the expression directly.
+bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[1].id", "8"));
+bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[1].objects[0].name", "obj5_name"));
+bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[1].objects[0].id", "5"));
+bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[1].objects[1].id", "6"));
+bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.myTest2List[1].objects[1].name", "obj6_name"));
 
-OGNL started out as a way to set up associations between UI components and controllers using property names. As the desire 
-for more complicated associations grew, Drew Davidson created what he called KVCL, for Key-Value Coding Language, egged 
-on by Luke Blanshard. Luke then reimplemented the language using ANTLR, came up with the new name, and, egged on by Drew, 
-filled it out to its current state. Later on Luke again reimplemented the language using JavaCC. Further maintenance 
-on all the code is done by Drew (with spiritual guidance from Luke).
+bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.set[0].name", "set0"));
+bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.set[1].name", "set1"));
+bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.stringSet[0]", "stringSet0"));
+bindingList.add(new AbstractMap.SimpleEntry<>("myTest2.stringSet[1]", "stringSet1"));
 
-We pronounce OGNL as a word, like the last syllables of a drunken pronunciation of "orthogonal."
+Ognl.getValue(bindingList, context, root);
+assertEquals(Long.valueOf(9), root.getMyTest2().getId());
+assertEquals(Long.valueOf(7), root.getMyTest2().getMyTest2List().get(0).getId());
+assertEquals(Long.valueOf(8), root.getMyTest2().getMyTest2List().get(1).getId());
+assertEquals(Long.valueOf(3), root.getMyTest2().getMyTest2List().get(0).getObjects().get(0).getId());
+assertEquals(Long.valueOf(4), root.getMyTest2().getMyTest2List().get(0).getObjects().get(1).getId());
+assertEquals(Long.valueOf(5), root.getMyTest2().getMyTest2List().get(1).getObjects().get(0).getId());
+assertEquals(Long.valueOf(6), root.getMyTest2().getMyTest2List().get(1).getObjects().get(1).getId());
+assertEquals(Long.valueOf(0), root.getMyTest2().getObjects().get(0).getId());
+Iterator<InsideTest> it = root.getMyTest2().getSet().iterator();
+assertEquals("set0", it.next().getName());
+assertEquals("set1", it.next().getName());
+Iterator<String> itStr = root.getMyTest2().getStringSet().iterator();
+assertEquals("stringSet0", itStr.next());
+assertEquals("stringSet1", itStr.next());
+assertEquals("obj0_name", root.getMyTest2().getObjects().get(0).getName());
+```
+with help of introducing a new data structure called `MapNode` which represents hirarchy, 
+and a new interface called `ObjectConstructor` navigation of every node in the hirarchy will calls
+the `processObjectForGet` method of it which enables us to do great stuff because we can intercept 
+and change the way the graph is going to be navigated. 
 
- - [Language Guide](docs/LanguageGuide.md)
- - [Developer Guide](docs/DeveloperGuide.md)
- - [Version Notes](docs/VersionNotes.md)
+For example can fetch an item from database and assign it to the object property.
 
-## FAQ
- - How to define an AccessMember?
-   - the best way is to implement your own `AccessMember` which will suite your project best, you can base on existing
-     [DefaultAccessMember](src/test/java/ognl/DefaultMemberAccess.java) and adjust it to your needs.
+`MapNode` let us to query the lower levels of the hirarchy. 
 
- - How to run OGNL in Google AppEngine?
-   - you need to tell OGNL to not do security manager permission checks, which will fail since GAE has a security manager 
-     and you don't have the ability to add the OGNL-specific permissions. Therefore, somewhere in your initialization code, 
-     add this `OgnlRuntime.setSecurityManager(null);`.
+For example you can query if the object has any id property and get its value.
+
+- It can expand `List` and `Arrays`
+- It supports parametrized type instantiation
+- And some other mintor extendings
