@@ -2,9 +2,19 @@
 
 ## If you don't know what is OGNL, then go check out [https://github.com/jkuhnert/ognl](https://github.com/jkuhnert/ognl)
 
-I created OGNL2, because I needed to make some changes to the original library!
+### I created OGNL2, because I needed to make some changes to the original library!
+### The most notable different with the original library is that Ognl2 is capable of
+### setting value to a chain of expressions like `myTest2.objects[0].name=test`
+### It instantiates or expands intermediate objects, lists or maps in the path,
+### if it is necessary
 
-Changes are notably as following:
+#### You may wondering why I did not created a pull request? because I originally derived this
+#### project about 4 years ago and accidentally lost all the source codes. There was only 
+#### a compiled version left of.
+#### Since then I could find a proper time or motivation to bring it back. Until now that I needed
+#### to make some changes to the library. That's why I decided to to make it Ognl2
+ 
+Other changes are notably as following:
 
 - Added support to navigate and apply a list of expressions an apply callbacks:
 
