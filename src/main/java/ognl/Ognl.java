@@ -759,10 +759,11 @@ public abstract class Ognl {
             if (cNode.getName() != null) {
                 context.put(Config.NEXT_CHAIN, cNode);
                 context.put(CURRENT_INDEX_KEY, new MutableInt(level));
-                context.put(Config.EXPRESSION_SET, Boolean.TRUE);
                 if (!cNode.getContainsValue()) {
+                    context.put(Config.EXPRESSION_SET, Boolean.FALSE);
                     getValue(parseExpression(cNode.getName()), context, root, null);
                 } else {
+                    context.put(Config.EXPRESSION_SET, Boolean.TRUE);
                     setValue(parseExpression(cNode.getName()), context, root, cNode.getValue());
                 }
             }

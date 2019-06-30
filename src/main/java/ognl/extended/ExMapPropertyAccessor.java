@@ -24,6 +24,13 @@ public class ExMapPropertyAccessor
             this.shiftGenericParameters(ognlContext, level);
             return target;
         }
+
+        if(context.get(Config.EXPRESSION_SET) == Boolean.TRUE) {
+            //Ok a literal without quotation passed eg [name] instead of ['name']
+            this.shiftGenericParameters(ognlContext, level);
+            return name;
+        }
+
         Map map = (Map) target;
         Node currentNode = ognlContext.getCurrentNode().jjtGetParent();
         boolean indexedAccess = false;
@@ -58,8 +65,10 @@ public class ExMapPropertyAccessor
     public void setProperty(Map context, Object target, Object name, Object value) throws OgnlException {
         OgnlContext ognlContext = (OgnlContext) context;
         int level = this.incIndex(context);
-        Class clsObj = (Class) this.getParameterizedType(ognlContext, level, 0);
-        name = OgnlOps.convertValue(name, clsObj);
+        Class keyClsObj = (Class) this.getParameterizedType(ognlContext, level, 0);
+        Class valueClsObj = (Class) this.getParameterizedType(ognlContext, level, 1);
+        name = OgnlOps.convertValue(name, keyClsObj);
+        value = OgnlOps.convertValue(value, valueClsObj);
         Map map = (Map) target;
         map.put(name, value);
     }

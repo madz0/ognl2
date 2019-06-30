@@ -305,4 +305,36 @@ public class PropertyAccessTest {
         assertEquals("", root.getObjects().get(0));
     }
 
+    @Test
+    public void bindEnumAsMapValueAndKeyWithoutQuotationTest() throws OgnlException {
+        OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
+        context.extend();
+        MyTest3 root = new MyTest3();
+        List<Map.Entry<String, Object>> bindingList = new ArrayList<>();
+        bindingList.add(new AbstractMap.SimpleEntry<>("testEnumMap[name]", "TEST1"));
+        Ognl.getValue(bindingList, context, root);
+        assertEquals(MyTest3.TestEnum.TEST1, root.getTestEnumMap().get("name"));
+    }
+
+    @Test
+    public void bindStringMapValueTest() throws OgnlException {
+        OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
+        context.extend();
+        MyTest3 root = new MyTest3();
+        List<Map.Entry<String, Object>> bindingList = new ArrayList<>();
+        bindingList.add(new AbstractMap.SimpleEntry<>("testStringMap[\"name\"]", "TEST1"));
+        Ognl.getValue(bindingList, context, root);
+        assertEquals("TEST1", root.getTestStringMap().get("name"));
+    }
+
+    @Test
+    public void bindIntegerMapValueTest() throws OgnlException {
+        OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
+        context.extend();
+        MyTest3 root = new MyTest3();
+        List<Map.Entry<String, Object>> bindingList = new ArrayList<>();
+        bindingList.add(new AbstractMap.SimpleEntry<>("testIntegerMap[1]", "TEST1"));
+        Ognl.getValue(bindingList, context, root);
+        assertEquals("TEST1", root.getTestIntegerMap().get(1));
+    }
 }

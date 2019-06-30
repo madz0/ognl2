@@ -121,7 +121,7 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
     }
 
     public boolean isNullInited(Map context) {
-        return context.containsKey(Config.EXPRESSION_SET);
+        return true;
     }
 
     public boolean isExpanded(Map context) {
