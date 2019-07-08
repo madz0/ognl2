@@ -68,17 +68,15 @@ Other changes are notably as following:
     assertEquals("stringSet1", itStr.next());
     assertEquals("obj0_name", root.getMyTest2().getObjects().get(0).getName());
     ```
-    With the help of introducing a new data structure called `MapNode` which represents hirarchy,
-     
-    and a new interface called `ObjectConstructor` navigation of every node in the hirarchy will 
-    call the `processObjectForGet` method of it which enables us to do great stuff because we 
-    can intercept and change the way the graph is going to be navigated. 
-    
-    For example can fetch an item from database and assign it to the object property.
-    
-    `MapNode` let us to query the lower levels of the hirarchy. 
-    
-    For example you can query if the object has any id property and get its value.
+With the help of introducing a new data structure called `MapNode` which represents hirarchy,
+and a new interface called `ObjectConstructor` navigation of every node in the hirarchy will 
+call the `processObjectForGet` method of it which enables us to do great stuff because we 
+can intercept and change the way the graph is going to be navigated. 
+For example one can fetch an item from the database and assign it to the object property.
+
+`MapNode` let us to query the lower levels of the hierarchy. 
+
+For example you can query if the object has any id property and get its value.
 
 - It can expand `List` and `Arrays`
 - It supports parametrized type instantiation
