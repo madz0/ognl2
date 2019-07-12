@@ -4,10 +4,11 @@ import com.github.madz0.ognl2.Ognl;
 import com.github.madz0.ognl2.Ognl;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class MapNode {
-    private Map<String, MapNode> children = new HashMap<>();
+    private Map<String, MapNode> children = new LinkedHashMap<>();
     private String name;
     private Object value;
     private Ognl.NodeType nodeType;

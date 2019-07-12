@@ -337,4 +337,22 @@ public class PropertyAccessTest {
         Ognl.getValue(bindingList, context, root);
         assertEquals("TEST1", root.getTestIntegerMap().get(1));
     }
+
+    @Test
+    public void bindStringMapOrderTest() throws OgnlException {
+        OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
+        context.extend();
+        MyTest3 root = new MyTest3();
+        List<Map.Entry<String, Object>> bindingList = new ArrayList<>();
+        bindingList.add(new AbstractMap.SimpleEntry<>("testStringMap[name1]", "TEST1"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("testStringMap[name2]", "TEST2"));
+        Ognl.getValue(bindingList, context, root);
+        assertEquals("TEST1", root.getTestStringMap().entrySet().iterator().next().getValue());
+        root = new MyTest3();
+        bindingList = new ArrayList<>();
+        bindingList.add(new AbstractMap.SimpleEntry<>("testStringMap[name2]", "TEST2"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("testStringMap[name1]", "TEST1"));
+        Ognl.getValue(bindingList, context, root);
+        assertEquals("TEST2", root.getTestStringMap().entrySet().iterator().next().getValue());
+    }
 }
