@@ -1,13 +1,14 @@
 package org.ognl.test;
 
+import com.github.madz0.ognl2.ASTChain;
 import junit.framework.TestCase;
-import ognl.DefaultMemberAccess;
-import ognl.Ognl;
-import ognl.OgnlContext;
+import com.github.madz0.ognl2.DefaultMemberAccess;
+import com.github.madz0.ognl2.Ognl;
+import com.github.madz0.ognl2.OgnlContext;
 import org.ognl.test.objects.IndexedSetObject;
 
 /**
- * Tests for {@link ognl.ASTChain}.
+ * Tests for {@link ASTChain}.
  */
 public class ASTChainTest extends TestCase {
 

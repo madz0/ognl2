@@ -1,11 +1,11 @@
 package org.ognl.test.accessors;
 
 import junit.framework.TestCase;
-import ognl.DefaultMemberAccess;
-import ognl.ListPropertyAccessor;
-import ognl.Ognl;
-import ognl.OgnlContext;
-import ognl.enhance.ExpressionCompiler;
+import com.github.madz0.ognl2.DefaultMemberAccess;
+import com.github.madz0.ognl2.ListPropertyAccessor;
+import com.github.madz0.ognl2.Ognl;
+import com.github.madz0.ognl2.OgnlContext;
+import com.github.madz0.ognl2.enhance.ExpressionCompiler;
 import org.ognl.test.objects.ListSource;
 import org.ognl.test.objects.ListSourceImpl;
 import org.ognl.test.objects.Root;

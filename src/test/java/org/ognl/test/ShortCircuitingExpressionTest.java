@@ -31,8 +31,8 @@
 package org.ognl.test;
 
 import junit.framework.TestSuite;
-import ognl.NoSuchPropertyException;
-import ognl.OgnlException;
+import com.github.madz0.ognl2.NoSuchPropertyException;
+import com.github.madz0.ognl2.OgnlException;
 
 public class ShortCircuitingExpressionTest extends OgnlTestCase
 {

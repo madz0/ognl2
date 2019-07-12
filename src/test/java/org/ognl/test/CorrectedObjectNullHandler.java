@@ -30,7 +30,7 @@
 //--------------------------------------------------------------------------
 package org.ognl.test;
 
-import ognl.NullHandler;
+import com.github.madz0.ognl2.NullHandler;
 
 import java.util.Map;
 

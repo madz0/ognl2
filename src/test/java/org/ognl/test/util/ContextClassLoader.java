@@ -30,7 +30,7 @@
 //--------------------------------------------------------------------------
 package org.ognl.test.util;
 
-import ognl.OgnlContext;
+import com.github.madz0.ognl2.OgnlContext;
 
 public class ContextClassLoader extends ClassLoader
 {

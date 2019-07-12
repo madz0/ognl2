@@ -31,8 +31,8 @@
 package org.ognl.test;
 
 import junit.framework.TestSuite;
-import ognl.InappropriateExpressionException;
-import ognl.NoSuchPropertyException;
+import com.github.madz0.ognl2.InappropriateExpressionException;
+import com.github.madz0.ognl2.NoSuchPropertyException;
 import org.ognl.test.objects.Root;
 
 import java.util.HashMap;

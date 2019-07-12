@@ -31,7 +31,7 @@
 package org.ognl.test;
 
 import junit.framework.TestSuite;
-import ognl.OgnlRuntime;
+import com.github.madz0.ognl2.OgnlRuntime;
 import org.ognl.test.objects.*;
 
 import java.util.List;

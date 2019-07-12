@@ -4,12 +4,12 @@
 package org.ognl.test.enhance;
 
 import junit.framework.TestCase;
-import ognl.DefaultMemberAccess;
-import ognl.Node;
-import ognl.Ognl;
-import ognl.OgnlContext;
-import ognl.enhance.ExpressionCompiler;
-import ognl.enhance.OgnlExpressionCompiler;
+import com.github.madz0.ognl2.DefaultMemberAccess;
+import com.github.madz0.ognl2.Node;
+import com.github.madz0.ognl2.Ognl;
+import com.github.madz0.ognl2.OgnlContext;
+import com.github.madz0.ognl2.enhance.ExpressionCompiler;
+import com.github.madz0.ognl2.enhance.OgnlExpressionCompiler;
 import org.ognl.test.objects.*;
 
 import java.util.Collection;

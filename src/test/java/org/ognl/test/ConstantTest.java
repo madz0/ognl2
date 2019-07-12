@@ -31,7 +31,7 @@
 package org.ognl.test;
 
 import junit.framework.TestSuite;
-import ognl.ExpressionSyntaxException;
+import com.github.madz0.ognl2.ExpressionSyntaxException;
 
 import java.util.Arrays;
 

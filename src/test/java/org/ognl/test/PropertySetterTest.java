@@ -1,10 +1,10 @@
 package org.ognl.test;
 
 import junit.framework.TestCase;
-import ognl.DefaultMemberAccess;
-import ognl.Node;
-import ognl.Ognl;
-import ognl.OgnlContext;
+import com.github.madz0.ognl2.DefaultMemberAccess;
+import com.github.madz0.ognl2.Node;
+import com.github.madz0.ognl2.Ognl;
+import com.github.madz0.ognl2.OgnlContext;
 
 import java.util.Map;
 

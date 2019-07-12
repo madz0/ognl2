@@ -31,7 +31,7 @@
 package org.ognl.test;
 
 import junit.framework.TestSuite;
-import ognl.OgnlException;
+import com.github.madz0.ognl2.OgnlException;
 import org.ognl.test.objects.Bean1;
 import org.ognl.test.objects.ObjectIndexed;
 

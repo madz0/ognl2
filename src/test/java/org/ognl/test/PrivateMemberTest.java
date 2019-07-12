@@ -32,11 +32,11 @@ package org.ognl.test;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import ognl.DefaultMemberAccess;
-import ognl.Ognl;
-import ognl.OgnlContext;
-import ognl.OgnlException;
-import ognl.OgnlRuntime;
+import com.github.madz0.ognl2.DefaultMemberAccess;
+import com.github.madz0.ognl2.Ognl;
+import com.github.madz0.ognl2.OgnlContext;
+import com.github.madz0.ognl2.OgnlException;
+import com.github.madz0.ognl2.OgnlRuntime;
 
 /**
  * This is a test program for private access in OGNL.

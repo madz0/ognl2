@@ -30,7 +30,7 @@
 //--------------------------------------------------------------------------
 package org.ognl.test.objects;
 
-import ognl.DynamicSubscript;
+import com.github.madz0.ognl2.DynamicSubscript;
 
 import java.util.*;
 

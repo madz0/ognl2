@@ -34,12 +34,12 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.LoaderClassPath;
-import ognl.ObjectPropertyAccessor;
-import ognl.OgnlContext;
-import ognl.OgnlException;
-import ognl.OgnlRuntime;
-import ognl.enhance.ContextClassLoader;
-import ognl.enhance.EnhancedClassLoader;
+import com.github.madz0.ognl2.ObjectPropertyAccessor;
+import com.github.madz0.ognl2.OgnlContext;
+import com.github.madz0.ognl2.OgnlException;
+import com.github.madz0.ognl2.OgnlRuntime;
+import com.github.madz0.ognl2.enhance.ContextClassLoader;
+import com.github.madz0.ognl2.enhance.EnhancedClassLoader;
 import org.ognl.test.util.NameFactory;
 
 import java.lang.reflect.Method;

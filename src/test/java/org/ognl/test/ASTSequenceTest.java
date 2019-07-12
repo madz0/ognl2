@@ -1,13 +1,10 @@
 package org.ognl.test;
 
+import com.github.madz0.ognl2.*;
 import junit.framework.TestCase;
-import ognl.DefaultMemberAccess;
-import ognl.Ognl;
-import ognl.OgnlContext;
-import ognl.SimpleNode;
 
 /**
- * Tests for {@link ognl.ASTSequence}.
+ * Tests for {@link ASTSequence}.
  */
 public class ASTSequenceTest extends TestCase {
 

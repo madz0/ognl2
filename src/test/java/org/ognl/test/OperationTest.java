@@ -1,13 +1,13 @@
 package org.ognl.test;
 
 import junit.framework.TestCase;
-import ognl.DefaultMemberAccess;
-import ognl.Ognl;
-import ognl.OgnlContext;
-import ognl.SimpleNode;
+import com.github.madz0.ognl2.DefaultMemberAccess;
+import com.github.madz0.ognl2.Ognl;
+import com.github.madz0.ognl2.OgnlContext;
+import com.github.madz0.ognl2.SimpleNode;
 
 /**
- * Tests for {@link ognl.SimpleNode#isOperation(OgnlContext)}.
+ * Tests for {@link SimpleNode#isOperation(OgnlContext)}.
  */
 public class OperationTest extends TestCase {
 
