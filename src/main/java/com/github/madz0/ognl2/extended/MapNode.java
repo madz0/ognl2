@@ -17,16 +17,20 @@ public class MapNode {
     private String path;
     private Boolean containsValue;
     private Boolean containsEmptyChildValue;
+    private String constantName;
 
     public MapNode(String name, Ognl.NodeType nodeType, MapNode parent, Boolean containsEmptyChildValue) {
         if (name.startsWith("[") && !name.startsWith("['")
                 && !name.startsWith("[\"") && !name.matches("\\[\\d+\\]")) {
-            name = "['" + name.substring(1, name.length() - 1) + "']";
+            this.constantName = "['" + name.substring(1, name.length() - 1) + "']";
+        }
+        else {
+            this.constantName = name;
         }
         this.name = name;
         this.nodeType = nodeType;
         this.parent = parent;
-        containsValue = false;
+        this.containsValue = false;
         this.containsEmptyChildValue = containsEmptyChildValue;
     }
 
@@ -90,5 +94,9 @@ public class MapNode {
 
     public Boolean getContainsEmptyChildValue() {
         return containsEmptyChildValue;
+    }
+
+    public String getConstantName() {
+        return this.constantName;
     }
 }

@@ -415,4 +415,17 @@ public class PropertyAccessTest {
         Ognl.getValue(bindingList, context, root);
         assertEquals("TEST2", root.getM().get("k2").get(0));
     }
+
+    @Test
+    public void bindMapInsideListWithEnumTest() throws OgnlException {
+        OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
+        context.extend();
+        MyTest root = new MyTest();
+        List<Map.Entry<String, Object>> bindingList = new ArrayList<>();
+        bindingList.add(new AbstractMap.SimpleEntry<>("l2[0][k1]", "TEST"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("l2[1][k1]", "TEST"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("objects[0]", "TESTObj"));
+        Ognl.getValue(bindingList, context, root);
+        assertEquals(MyTest.X.TEST, root.getL2().get(1).get("k1"));
+    }
 }

@@ -764,10 +764,10 @@ public abstract class Ognl {
                 context.put(CURRENT_INDEX_KEY, new MutableInt(level));
                 if (!cNode.getContainsValue()) {
                     context.put(Config.EXPRESSION_SET, Boolean.FALSE);
-                    getValue(parseExpression(cNode.getName()), context, root, null);
+                    getValue(parseExpression(cNode.getConstantName()), context, root, null);
                 } else {
                     context.put(Config.EXPRESSION_SET, Boolean.TRUE);
-                    setValue(parseExpression(cNode.getName()), context, root, cNode.getValue());
+                    setValue(parseExpression(cNode.getConstantName()), context, root, cNode.getValue());
                 }
             }
         }
