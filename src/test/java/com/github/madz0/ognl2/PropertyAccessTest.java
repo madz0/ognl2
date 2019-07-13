@@ -367,4 +367,52 @@ public class PropertyAccessTest {
         Ognl.getValue(bindingList, context, root);
         assertEquals("TEST1", root.getMap().get("name1"));
     }
+
+    @Test
+    public void bindMapInsideListTest() throws OgnlException {
+        OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
+        context.extend();
+        MyTest root = new MyTest();
+        List<Map.Entry<String, Object>> bindingList = new ArrayList<>();
+        bindingList.add(new AbstractMap.SimpleEntry<>("l[0][k1]", "TEST1"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("l[0][k2]", "TEST2"));
+        Ognl.getValue(bindingList, context, root);
+        assertEquals("TEST1", root.getL().get(0).get("k1"));
+    }
+
+    @Test
+    public void bindMapInsideList2Test() throws OgnlException {
+        OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
+        context.extend();
+        MyTest root = new MyTest();
+        List<Map.Entry<String, Object>> bindingList = new ArrayList<>();
+        bindingList.add(new AbstractMap.SimpleEntry<>("l[0][k1]", "TEST1"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("l[1][k1]", "TEST2"));
+        Ognl.getValue(bindingList, context, root);
+        assertEquals("TEST2", root.getL().get(1).get("k1"));
+    }
+
+    @Test
+    public void bindListInsideMapTest() throws OgnlException {
+        OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
+        context.extend();
+        MyTest root = new MyTest();
+        List<Map.Entry<String, Object>> bindingList = new ArrayList<>();
+        bindingList.add(new AbstractMap.SimpleEntry<>("m[k1][0]", "TEST1"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("m['k1'][1]", "TEST2"));
+        Ognl.getValue(bindingList, context, root);
+        assertEquals("TEST1", root.getM().get("k1").get(0));
+    }
+
+    @Test
+    public void bindListInsideMap2Test() throws OgnlException {
+        OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
+        context.extend();
+        MyTest root = new MyTest();
+        List<Map.Entry<String, Object>> bindingList = new ArrayList<>();
+        bindingList.add(new AbstractMap.SimpleEntry<>("m[k1][0]", "TEST1"));
+        bindingList.add(new AbstractMap.SimpleEntry<>("m[k2][0]", "TEST2"));
+        Ognl.getValue(bindingList, context, root);
+        assertEquals("TEST2", root.getM().get("k2").get(0));
+    }
 }

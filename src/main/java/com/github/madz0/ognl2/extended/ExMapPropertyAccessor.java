@@ -22,13 +22,11 @@ public class ExMapPropertyAccessor
             this.shiftGenericParameters(ognlContext, level);
             return target;
         }
-
-        if (context.get(Config.EXPRESSION_SET) == Boolean.TRUE) {
+        /*if (!((OgnlContext) context).getCurrentNode().toString().equals("\""+name+"\"")) {
             //Ok a literal without quotation passed eg [name] instead of ['name']
             this.shiftGenericParameters(ognlContext, level);
             return name;
-        }
-
+        }*/
         Map map = (Map) target;
         Node currentNode = ognlContext.getCurrentNode().jjtGetParent();
         boolean indexedAccess = false;

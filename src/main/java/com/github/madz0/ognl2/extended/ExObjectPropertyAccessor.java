@@ -34,10 +34,10 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
                 if (!this.isUnknownIsLiteral(context)) {
                     throw new NoSuchPropertyException(target, name);
                 }
-                if (name == null)
+                if (name == null) {
                     return null;
-                String string = name.toString();
-                return string;
+                }
+                return name.toString();
             }
             if (!this.isSetChain(context)) {
                 return super.getProperty(context, target, name);
@@ -90,9 +90,8 @@ public class ExObjectPropertyAccessor extends ObjectPropertyAccessor implements 
             return;
         }
         try {
-            value = processObjectForSet((OgnlContext) context, target, (String)name, name, value);
-        }
-        catch (PropertySetIgnoreException e) {
+            value = processObjectForSet((OgnlContext) context, target, (String) name, name, value);
+        } catch (PropertySetIgnoreException e) {
             return;
         }
 

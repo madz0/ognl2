@@ -3,7 +3,6 @@ package com.github.madz0.ognl2.extended;
 import com.github.madz0.ognl2.OgnlException;
 import com.github.madz0.ognl2.Ognl;
 import com.github.madz0.ognl2.OgnlContext;
-import com.github.madz0.ognl2.OgnlException;
 import com.github.madz0.ognl2.OgnlRuntime;
 
 import java.lang.reflect.Array;
@@ -66,15 +65,22 @@ public class DefaultObjectConstructor implements ObjectConstructor {
     public Object processObjectForGet(OgnlContext context, Object root, OgnlPropertyDescriptor propertyDescriptor,
                                       Object propertyObject, MapNode node) {
         if (node != null) {
-            context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
-            if (node.isCollection() && propertyDescriptor.isPropertyDescriptor()) {
-                context.extend(findParameterizedType(propertyDescriptor.getReadMethod().getGenericReturnType()));
+            OgnlContext newContext = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
+            if (node.isCollection()) {
+                if (propertyDescriptor.isPropertyDescriptor()) {
+                    newContext.extend(findParameterizedType(propertyDescriptor.getReadMethod().getGenericReturnType()));
+                } else {
+                    //Since there is no readMethod, then we are handling parameterized inside parametrized like List<Map>
+                    //We use previous info to handle this
+                    Type[] previousActualArguments = ((Type[]) context.get(Config.PARAMETERIZED_ROOT_TYPE_KEY));
+                    newContext.extend((ParameterizedType) previousActualArguments[previousActualArguments.length - 1]);
+                }
             } else {
-                context.extend();
+                newContext.extend();
             }
-            context.setObjectConstructor(this);
+            newContext.setObjectConstructor(this);
             try {
-                Ognl.getValue(node, context, propertyObject);
+                Ognl.getValue(node, newContext, propertyObject);
             } catch (OgnlException e) {
                 e.printStackTrace();
             }

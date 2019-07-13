@@ -102,13 +102,10 @@ public class ASTProperty extends SimpleNode implements NodeType {
     protected Object getValueBody(OgnlContext context, Object source)
             throws OgnlException {
         Object property = getProperty(context, source);
-
         Object result = OgnlRuntime.getProperty(context, source, property);
-
         if (result == null) {
             result = OgnlRuntime.getNullHandler(OgnlRuntime.getTargetClass(source)).nullPropertyValue(context, source, property);
         }
-
         return result;
     }
 

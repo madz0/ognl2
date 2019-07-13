@@ -1,15 +1,15 @@
 package com.github.madz0.ognl2.model;
 
-import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.List;
+import java.util.Map;
+
+@Getter
+@Setter
 public class MyTest {
     private List<Object> objects;
-
-    public List<Object> getObjects() {
-        return objects;
-    }
-
-    public void setObjects(List<Object> objects) {
-        this.objects = objects;
-    }
+    private List<Map<String, String>> l;
+    private Map<String, List<String>> m;
 }

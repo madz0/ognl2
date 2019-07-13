@@ -10,7 +10,7 @@
     <groupId>com.github.madz0</groupId>
     <artifactId>ognl2</artifactId>
     <packaging>jar</packaging>
-    <version>2.6-SNAPSHOT</version>
+    <version>2.7-SNAPSHOT</version>
     <name>OGNL2 - Object Graph Navigation and Binding Library </name>
     <description>OGNL2 - Extended version of famous OGNL library derived from version 3.2.11-SNAPSHOT</description>
 

@@ -19,6 +19,10 @@ public class MapNode {
     private Boolean containsEmptyChildValue;
 
     public MapNode(String name, Ognl.NodeType nodeType, MapNode parent, Boolean containsEmptyChildValue) {
+        if (name.startsWith("[") && !name.startsWith("['")
+                && !name.startsWith("[\"") && !name.matches("\\[\\d+\\]")) {
+            name = "['" + name.substring(1, name.length() - 1) + "']";
+        }
         this.name = name;
         this.nodeType = nodeType;
         this.parent = parent;

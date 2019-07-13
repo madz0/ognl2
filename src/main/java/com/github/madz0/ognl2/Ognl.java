@@ -757,12 +757,11 @@ public abstract class Ognl {
 
     public static Object getValue(MapNode node, Map context, Object root) throws OgnlException {
         int level = ((MutableInt) context.get(Config.CURRENT_INDEX_KEY)).get();
-        for (Iterator<Map.Entry<String, MapNode>> iterator = node.getChildren().entrySet().iterator(); iterator.hasNext(); ) {
-            Map.Entry<String, MapNode> nodeEntry = iterator.next();
+        for (Map.Entry<String, MapNode> nodeEntry : node.getChildren().entrySet()) {
             MapNode cNode = nodeEntry.getValue();
             if (cNode.getName() != null) {
                 context.put(Config.NEXT_CHAIN, cNode);
-                context.put(Config.CURRENT_INDEX_KEY, new MutableInt(level));
+                context.put(CURRENT_INDEX_KEY, new MutableInt(level));
                 if (!cNode.getContainsValue()) {
                     context.put(Config.EXPRESSION_SET, Boolean.FALSE);
                     getValue(parseExpression(cNode.getName()), context, root, null);
@@ -874,6 +873,12 @@ public abstract class Ognl {
                     }
                 }
                 if (name.length() == 0) {
+                    if (token != null) {
+                        if (token.getIsPartOfName()) {
+                            name.append(ch);
+                        }
+                        nextToken = token;
+                    }
                     continue;
                 }
                 if (!isEndDetected && token != null) {
