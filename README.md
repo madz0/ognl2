@@ -3,7 +3,7 @@
 ## If you don't know what is OGNL, then go check out [https://github.com/jkuhnert/ognl](https://github.com/jkuhnert/ognl)
 
 <b>I created OGNL2, because I needed to make some changes to the original library!
-The most notable different with the original library is that Ognl2 is capable of
+The most notable difference with the original library is that Ognl2 is capable of
 setting value to a chain of expressions like `myTest2.objects[0].name=test`
 It instantiates or expands intermediate objects, lists or maps in the path,
 if it is necessary</b>
@@ -19,7 +19,7 @@ are extensively using this implementation.
  
 Other changes are notably as following:
 
-- Added support to navigate and apply a list of expressions an apply callbacks:
+- Added support to navigate a list of expressions and apply callbacks:
 
     ```java
     OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null, new DefaultMemberAccess(false));
@@ -80,4 +80,4 @@ For example you can query if the object has any id property and get its value.
 
 - It can expand `List` and `Arrays`
 - It supports parametrized type instantiation
-- And some other mintor extendings
+- And some other minor extendings
